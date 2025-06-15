@@ -756,7 +756,7 @@ local player  = Players.LocalPlayer
 
 -- НАСТРОЙКИ
 local moveDistance  = 10      -- расстояние рывка (в студиях)
-local dashCooldown  = 0     -- минимальный интервал между рывками (сек)
+local dashCooldown  = 0.5     -- минимальный интервал между рывками (сек)
 
 -- ВРЕМЯ ПОСЛЕДНЕГО РЫВКА
 local lastDash = 0
