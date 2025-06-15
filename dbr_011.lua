@@ -210,6 +210,66 @@ game:GetService("Workspace").KateOnFire1.HumanoidRootPart.CFrame = game:GetServi
 	end,
 
 })
+
+local Button = MainTab:CreateButton({
+   Name = "totem1",
+   Callback = function()
+
+game:GetService("Workspace").KateOnFire1.HumanoidRootPart.CFrame = workspace.Totem1.PrimaryPart.CFrame
+
+	end,
+
+})
+
+local Button = MainTab:CreateButton({
+   Name = "totem2",
+   Callback = function()
+
+game:GetService("Workspace").KateOnFire1.HumanoidRootPart.CFrame = workspace.Totem2.PrimaryPart.CFrame
+
+	end,
+
+})
+
+local Button = MainTab:CreateButton({
+   Name = "totem3",
+   Callback = function()
+
+game:GetService("Workspace").KateOnFire1.HumanoidRootPart.CFrame = workspace.Totem3.PrimaryPart.CFrame
+
+	end,
+
+})
+
+local Button = MainTab:CreateButton({
+   Name = "totem4",
+   Callback = function()
+
+game:GetService("Workspace").KateOnFire1.HumanoidRootPart.CFrame = workspace.Totem4.PrimaryPart.CFrame
+
+	end,
+
+})
+
+local Button = MainTab:CreateButton({
+   Name = "totem5",
+   Callback = function()
+
+game:GetService("Workspace").KateOnFire1.HumanoidRootPart.CFrame = workspace.Totem5.PrimaryPart.CFrame
+
+	end,
+
+})
+
+local Button = MainTab:CreateButton({
+   Name = "totem6",
+   Callback = function()
+
+game:GetService("Workspace").KateOnFire1.HumanoidRootPart.CFrame = workspace.Totem6.PrimaryPart.CFrame
+
+	end,
+
+})
    
 local MiscTab = Window:CreateTab("misc", nil) -- Title, Image
 local Section = MiscTab:CreateSection("island")
@@ -468,6 +528,43 @@ for i = 1, 7 do
         })
     else
         warn("Объект " .. trapName .. " не найден")
+    end
+end
+
+	end,
+
+})
+
+local Toggle = MiscTab:CreateToggle({
+   Name = "esp - totem",
+   CurrentValue = false,
+   Flag = "toggleexample",
+   Callback = function(Value)
+
+local ESP = loadstring(game:HttpGet("https://Kiriot22.com/releases/ESP.lua"))()
+
+ESP.Players = false
+ESP.Boxes = false
+ESP.Names = true
+ESP:Toggle(true)
+
+-- Флаг включения ESP
+ESP.showCollisionESP = true
+
+-- Подсветка Totem1–Totem7
+for i = 1, 7 do
+    local totemName = "Totem" .. i
+    local totem = workspace:FindFirstChild(totemName)
+
+    if totem then
+        ESP:AddObjectListener(workspace, {
+            Name = totemName,
+            CustomName = "Totem" .. i,
+            Color = Color3.fromRGB(0, 150, 255), -- голубой цвет для тотемов
+            IsEnabled = "showCollisionESP"
+        })
+    else
+        warn("Объект " .. totemName .. " не найден")
     end
 end
 
