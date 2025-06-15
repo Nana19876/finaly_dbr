@@ -424,3 +424,12 @@ end
 	
 })
 
+local Toggle = MiscTab:CreateToggle({
+   Name = "esp - trap",
+   CurrentValue = false,
+   Flag = "toggleexample",
+   Callback = function(Value)
+
+	end,
+
+})
