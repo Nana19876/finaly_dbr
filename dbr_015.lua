@@ -664,8 +664,11 @@ end
 
 })
 			
-local TPTab = Window:CreateTab("🎲 Misc", nil) -- Title, Image
+local TPTab = Window:CreateTab("🏝 Teleports", nil) -- Title, Image
 
-	end,
-
+local Button1 = TPTab:CreateButton({
+   Name = "Starter Island",
+   Callback = function()
+        --Teleport1
+   end,
 })
