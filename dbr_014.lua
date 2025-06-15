@@ -664,8 +664,7 @@ end
 
 })
 			
-local MiscTab = Window:CreateTab("misc2", nil) -- Title, Image
-local Section = MiscTab:CreateSection("island2")
+local TPTab = Window:CreateTab("🎲 Misc", nil) -- Title, Image
 
 	end,
 
