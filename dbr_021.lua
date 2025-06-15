@@ -749,48 +749,42 @@ local Button1 = TPTab:CreateButton({
    Name = "dead hard (E)",
    Callback = function()
 
--- SERVICES
-local UIS     = game:GetService("UserInputService")
+local UIS = game:GetService("UserInputService")
 local Players = game:GetService("Players")
-local player  = Players.LocalPlayer
+local player = Players.LocalPlayer
 
--- НАСТРОЙКИ
-local moveDistance  = 10      -- расстояние рывка (в студиях)
-local dashCooldown  = 0.5     -- минимальный интервал между рывками (сек)
-
--- ВРЕМЯ ПОСЛЕДНЕГО РЫВКА
-local lastDash = 0
+local moveDistance = 10         -- расстояние рывка вперёд
+local dashCooldown = 0        -- задержка между рывками в секундах
+local lastDash = 0              -- время последнего рывка
 
 -- Функция рывка
 local function dash()
-    local char = player.Character
-    if not char then return end
+	local char = player.Character
+	if not char then return end
 
-    -- проверяем кулдаун
-    local now = tick()
-    if now - lastDash < dashCooldown then return end
-    lastDash = now
+	local root = char:FindFirstChild("HumanoidRootPart")
+	if not root then return end
 
-    -- перемещаем HumanoidRootPart вперёд
-    local root = char:FindFirstChild("HumanoidRootPart")
-    if root then
-        root.CFrame = root.CFrame + (root.CFrame.LookVector * moveDistance)
-    end
+	local now = tick()
+	if now - lastDash < dashCooldown then return end
+	lastDash = now
+
+	root.CFrame = root.CFrame + (root.CFrame.LookVector * moveDistance)
 end
 
--- Обработка нажатий клавиш
+-- Обработка клавиши Z
 UIS.InputBegan:Connect(function(input, gameProcessed)
-    -- Не обращаем внимания на то, обработала ли игра нажатие — нам нужен рывок в любом случае
-    if input.UserInputType ~= Enum.UserInputType.Keyboard then return end
-    
-    if input.KeyCode == Enum.KeyCode.E or input.KeyCode == Enum.KeyCode.W then
-        dash()
-    end
+	if gameProcessed then return end
+	if input.UserInputType ~= Enum.UserInputType.Keyboard then return end
+
+	if input.KeyCode == Enum.KeyCode.E then
+		dash()
+	end
 end)
 
--- Если персонаж перереспавнится — ждём, пока появится HumanoidRootPart
+-- Обновляем ссылку на персонажа после респавна
 player.CharacterAdded:Connect(function(char)
-    char:WaitForChild("HumanoidRootPart")
+	char:WaitForChild("HumanoidRootPart")
 end)
 
 
