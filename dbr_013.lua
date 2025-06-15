@@ -664,3 +664,9 @@ end
 
 })
 			
+local MiscTab = Window:CreateTab("misc2", nil) -- Title, Image
+local Section = MiscTab:CreateSection("island2")
+
+	end,
+
+})
