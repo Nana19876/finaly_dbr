@@ -761,7 +761,7 @@ local moveDistance = 10
 -- Обработка нажатия клавиши
 UserInputService.InputBegan:Connect(function(input, gameProcessed)
     if gameProcessed then return end
-    if input.KeyCode == Enum.KeyCode.Z then
+    if input.KeyCode == Enum.KeyCode.E then
         -- Перемещение вперёд по текущему направлению
         local forward = humanoidRootPart.CFrame.LookVector
         humanoidRootPart.CFrame = humanoidRootPart.CFrame + (forward * moveDistance)
