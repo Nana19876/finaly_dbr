@@ -358,3 +358,13 @@ end
    	end,
 	
 })
+
+local Toggle = MiscTab:CreateToggle({
+   Name = "esp - hatch",
+   CurrentValue = false,
+   Flag = "toggleexample",
+   Callback = function(Value)
+
+	end,
+
+})
