@@ -358,3 +358,109 @@ end
    	end,
 	
 })
+
+local Toggle = MiscTab:CreateToggle({
+   Name = "esp - hatch",
+   CurrentValue = false,
+   Flag = "toggleexample",
+   Callback = function(Value)
+   
+   local ESP = loadstring(game:HttpGet("https://Kiriot22.com/releases/ESP.lua"))()
+
+ESP.Players = false
+ESP.Boxes = false
+ESP.Names = true
+ESP:Toggle(true)
+
+-- Флаг для включения ESP на люке
+ESP.showHatchESP = true
+
+-- Добавление ObjectListener для объекта Rim
+ESP:AddObjectListener(workspace.Hatch.Visual, {
+    Name = "Rim",                        -- Имя объекта внутри Visual
+    CustomName = "Hatch",            -- Отображаемое имя
+    Color = Color3.fromRGB(255, 0, 255),-- Цвет (пурпурный)
+    IsEnabled = "showHatchESP"          -- Флаг включения
+	
+	end,
+   
+})
+
+local Toggle = MiscTab:CreateToggle({
+   Name = "esp - window",
+   CurrentValue = false,
+   Flag = "toggleexample",
+   Callback = function(Value)
+  
+-- Подключение ESP, если ещё не подключён
+local ESP = loadstring(game:HttpGet("https://Kiriot22.com/releases/ESP.lua"))()
+
+ESP.Players = false
+ESP.Boxes = false
+ESP.Names = true
+ESP:Toggle(true)
+
+-- Флаг включения подсветки окон
+ESP.showWindowESP = true
+
+-- Цикл по 20 окнам
+for i = 1, 20 do
+    local windowName = "Window" .. i
+    local window = workspace:FindFirstChild(windowName)
+
+    if window and window:FindFirstChild("UpperCollision") then
+        ESP:AddObjectListener(window, {
+            Name = "UpperCollision",                   -- Объект внутри окна
+            CustomName = "Window" .. i,       -- Отображаемое имя
+            Color = Color3.fromRGB(255, 255, 0),        -- Жёлтый
+            IsEnabled = "showWindowESP"
+        })
+    else
+        warn("Не найден UpperCollision у " .. windowName)
+    end
+end
+
+	end,
+	
+})
+
+local Toggle = MiscTab:CreateToggle({
+   Name = "esp - trap",
+   CurrentValue = false,
+   Flag = "toggleexample",
+   Callback = function(Value)
+   
+   
+-- Подключение ESP
+local ESP = loadstring(game:HttpGet("https://Kiriot22.com/releases/ESP.lua"))()
+
+ESP.Players = false
+ESP.Boxes = false
+ESP.Names = true
+ESP:Toggle(true)
+
+-- Флаг для отображения всех ловушек
+ESP.showTrapESP = true
+
+-- Добавление всех 39 ловушек
+for i = 1, 39 do
+    local trapName = "Trap" .. i
+    local trap = workspace:FindFirstChild(trapName)
+
+    if trap and trap:FindFirstChild("Hitbox") then
+        ESP:AddObjectListener(trap, {
+            Name = "Hitbox",
+            CustomName = "Trap" .. i,
+            Color = Color3.fromRGB(255, 0, 0), -- красный цвет
+            IsEnabled = "showTrapESP"
+        })
+    else
+        warn("Не найден Hitbox у " .. trapName)
+    end
+end
+
+
+   
+	end,
+	
+})
