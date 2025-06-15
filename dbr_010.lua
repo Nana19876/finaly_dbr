@@ -200,7 +200,16 @@ end
 	end,
 	
 })
-   
+
+local Button = MainTab:CreateButton({
+   Name = "hatch",
+   Callback = function()
+
+game:GetService("Workspace").KateOnFire1.HumanoidRootPart.CFrame = game:GetService("Workspace").Hatch.Visual.Rim.CFrame
+
+	end,
+
+})
    
 local MiscTab = Window:CreateTab("misc", nil) -- Title, Image
 local Section = MiscTab:CreateSection("island")
@@ -422,6 +431,43 @@ for i = 1, 30 do
         })
     else
         warn("Не найден UpperCollision у " .. windowName)
+    end
+end
+
+	end,
+
+})
+
+local Toggle = MiscTab:CreateToggle({
+   Name = "esp - trap",
+   CurrentValue = false,
+   Flag = "toggleexample",
+   Callback = function(Value)
+
+local ESP = loadstring(game:HttpGet("https://Kiriot22.com/releases/ESP.lua"))()
+
+ESP.Players = false
+ESP.Boxes = false
+ESP.Names = true
+ESP:Toggle(true)
+
+-- Флаг включения ESP
+ESP.showCollisionESP = true
+
+-- Подсветка объектов Trap1–Trap7
+for i = 1, 7 do
+    local trapName = "Trap" .. i
+    local trap = workspace:FindFirstChild(trapName)
+
+    if trap then
+        ESP:AddObjectListener(workspace, {
+            Name = trapName,
+            CustomName = "Trap" .. i,
+            Color = Color3.fromRGB(255, 0, 0), -- красный цвет для ловушек
+            IsEnabled = "showCollisionESP"
+        })
+    else
+        warn("Объект " .. trapName .. " не найден")
     end
 end
 
