@@ -270,6 +270,61 @@ game:GetService("Workspace").KateOnFire1.HumanoidRootPart.CFrame = workspace.Tot
 	end,
 
 })
+
+local Button = MainTab:CreateButton({
+   Name = "сhest1",
+   Callback = function()
+
+game:GetService("Workspace").KateOnFire1.HumanoidRootPart.CFrame = workspace.Chest1.PrimaryPart.CFrame
+
+
+	end,
+
+})
+
+local Button = MainTab:CreateButton({
+   Name = "сhest2",
+   Callback = function()
+
+game:GetService("Workspace").KateOnFire1.HumanoidRootPart.CFrame = workspace.Chest2.PrimaryPart.CFrame
+
+
+	end,
+
+})
+
+local Button = MainTab:CreateButton({
+   Name = "сhest3",
+   Callback = function()
+
+game:GetService("Workspace").KateOnFire1.HumanoidRootPart.CFrame = workspace.Chest3.PrimaryPart.CFrame
+
+
+	end,
+
+})
+
+local Button = MainTab:CreateButton({
+   Name = "сhest4",
+   Callback = function()
+
+game:GetService("Workspace").KateOnFire1.HumanoidRootPart.CFrame = workspace.Chest4.PrimaryPart.CFrame
+
+
+	end,
+
+})
+
+local Button = MainTab:CreateButton({
+   Name = "сhest5",
+   Callback = function()
+
+game:GetService("Workspace").KateOnFire1.HumanoidRootPart.CFrame = workspace.Chest5.PrimaryPart.CFrame
+
+
+	end,
+
+})
    
 local MiscTab = Window:CreateTab("misc", nil) -- Title, Image
 local Section = MiscTab:CreateSection("island")
@@ -571,3 +626,41 @@ end
 	end,
 
 })
+
+local Toggle = MiscTab:CreateToggle({
+   Name = "esp - chest",
+   CurrentValue = false,
+   Flag = "toggleexample",
+   Callback = function(Value)
+
+local ESP = loadstring(game:HttpGet("https://Kiriot22.com/releases/ESP.lua"))()
+
+ESP.Players = false
+ESP.Boxes = false
+ESP.Names = true
+ESP:Toggle(true)
+
+-- Флаг включения ESP
+ESP.showCollisionESP = true
+
+-- Подсветка сундуков Chest1–Chest5
+for i = 1, 5 do
+    local chestName = "Chest" .. i
+    local chest = workspace:FindFirstChild(chestName)
+
+    if chest then
+        ESP:AddObjectListener(workspace, {
+            Name = chestName,
+            CustomName = "Chest" .. i,
+            Color = Color3.fromRGB(47, 81, 42), -- золотистый цвет
+            IsEnabled = "showCollisionESP"
+        })
+    else
+        warn("Объект " .. chestName .. " не найден")
+    end
+end
+
+	end,
+
+})
+			
