@@ -34,14 +34,14 @@ Rayfield:Notify({
    Content = "Very cool gui",
    Duration = 5,
    Image = 13047715178,
-   Actions = { -- Notification Buttons
-      Ignore = {
+   Actions = {
+      {
          Name = "Okay!",
          Callback = function()
-         print("The user tapped Okay!")
-      end
-   },
-},
+            print("The user tapped Okay!")
+         end
+      }
+   }
 })
 
 local Button = MainTab:CreateButton({
