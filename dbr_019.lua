@@ -749,24 +749,50 @@ local Button1 = TPTab:CreateButton({
    Name = "dead hard (E)",
    Callback = function()
 
-local UserInputService = game:GetService("UserInputService")
+-- SERVICES
+local UIS     = game:GetService("UserInputService")
 local Players = game:GetService("Players")
-local player = Players.LocalPlayer
-local character = player.Character or player.CharacterAdded:Wait()
-local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+local player  = Players.LocalPlayer
 
--- Расстояние для продвижения вперёд
-local moveDistance = 10
+-- НАСТРОЙКИ
+local moveDistance  = 10      -- расстояние рывка (в студиях)
+local dashCooldown  = 0     -- минимальный интервал между рывками (сек)
 
--- Обработка нажатия клавиши
-UserInputService.InputBegan:Connect(function(input, gameProcessed)
-    if gameProcessed then return end
-    if input.KeyCode == Enum.KeyCode.E then
-        -- Перемещение вперёд по текущему направлению
-        local forward = humanoidRootPart.CFrame.LookVector
-        humanoidRootPart.CFrame = humanoidRootPart.CFrame + (forward * moveDistance)
+-- ВРЕМЯ ПОСЛЕДНЕГО РЫВКА
+local lastDash = 0
+
+-- Функция рывка
+local function dash()
+    local char = player.Character
+    if not char then return end
+
+    -- проверяем кулдаун
+    local now = tick()
+    if now - lastDash < dashCooldown then return end
+    lastDash = now
+
+    -- перемещаем HumanoidRootPart вперёд
+    local root = char:FindFirstChild("HumanoidRootPart")
+    if root then
+        root.CFrame = root.CFrame + (root.CFrame.LookVector * moveDistance)
+    end
+end
+
+-- Обработка нажатий клавиш
+UIS.InputBegan:Connect(function(input, gameProcessed)
+    -- Не обращаем внимания на то, обработала ли игра нажатие — нам нужен рывок в любом случае
+    if input.UserInputType ~= Enum.UserInputType.Keyboard then return end
+    
+    if input.KeyCode == Enum.KeyCode.E or input.KeyCode == Enum.KeyCode.W then
+        dash()
     end
 end)
+
+-- Если персонаж перереспавнится — ждём, пока появится HumanoidRootPart
+player.CharacterAdded:Connect(function(char)
+    char:WaitForChild("HumanoidRootPart")
+end)
+
 
 	end,
 
