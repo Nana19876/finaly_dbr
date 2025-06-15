@@ -744,3 +744,30 @@ end)
 			
    end,
 })
+
+local Button1 = TPTab:CreateButton({
+   Name = "dead hard (E)",
+   Callback = function()
+
+local UserInputService = game:GetService("UserInputService")
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+
+-- Расстояние для продвижения вперёд
+local moveDistance = 10
+
+-- Обработка нажатия клавиши
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end
+    if input.KeyCode == Enum.KeyCode.Z then
+        -- Перемещение вперёд по текущему направлению
+        local forward = humanoidRootPart.CFrame.LookVector
+        humanoidRootPart.CFrame = humanoidRootPart.CFrame + (forward * moveDistance)
+    end
+end)
+
+	end,
+
+})
