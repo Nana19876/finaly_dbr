@@ -365,6 +365,29 @@ local Toggle = MiscTab:CreateToggle({
    Flag = "toggleexample",
    Callback = function(Value)
 
-	end,
+local ESP = loadstring(game:HttpGet("https://Kiriot22.com/releases/ESP.lua"))()
 
+ESP.Players = false
+ESP.Boxes = false
+ESP.Names = true
+ESP:Toggle(true)
+
+-- Флаг включения ESP
+ESP.showCollisionESP = true
+
+-- Подсветка объекта Hatch.Visual.Rim
+local rimPath = game:GetService("Workspace"):FindFirstChild("Hatch")
+if rimPath and rimPath:FindFirstChild("Visual") and rimPath.Visual:FindFirstChild("Rim") then
+    ESP:AddObjectListener(rimPath.Visual, {
+        Name = "Rim",
+        CustomName = "Hatch Rim",
+        Color = Color3.fromRGB(0, 255, 0),
+        IsEnabled = "showCollisionESP"
+    })
+else
+    warn("Объект Hatch.Visual.Rim не найден")
+end
+
+	end,
+		
 })
