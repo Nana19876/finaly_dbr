@@ -358,30 +358,3 @@ end
    	end,
 	
 })
-
-local Toggle = MiscTab:CreateToggle({
-   Name = "esp - hatch",
-   CurrentValue = false,
-   Flag = "toggleexample",
-   Callback = function(Value)
-   
-   local ESP = loadstring(game:HttpGet("https://Kiriot22.com/releases/ESP.lua"))()
-
-ESP.Players = false
-ESP.Boxes = false
-ESP.Names = true
-ESP:Toggle(true)
-
--- Флаг для включения ESP на люке
-ESP.showHatchESP = true
-
--- Добавление ObjectListener для объекта Rim
-ESP:AddObjectListener(workspace.Hatch.Visual, {
-    Name = "Rim",                        -- Имя объекта внутри Visual
-    CustomName = "Hatch",            -- Отображаемое имя
-    Color = Color3.fromRGB(255, 0, 255),-- Цвет (пурпурный)
-    IsEnabled = "showHatchESP"          -- Флаг включения
-	
-	end,
-   
-})
