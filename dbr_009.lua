@@ -26,7 +26,7 @@ local Window = Rayfield:CreateWindow({
    }
 })
 
-local MainTab = Window:CreateTab("🏠 Home", nil) -- Title, Image
+local MainTab = Window:CreateTab("Teleport", nil) -- Title, Image
 local MainSection = MainTab:CreateSection("Main")
 
 Rayfield:Notify({
@@ -380,7 +380,7 @@ local rimPath = game:GetService("Workspace"):FindFirstChild("Hatch")
 if rimPath and rimPath:FindFirstChild("Visual") and rimPath.Visual:FindFirstChild("Rim") then
     ESP:AddObjectListener(rimPath.Visual, {
         Name = "Rim",
-        CustomName = "Hatch Rim",
+        CustomName = "Hatch",
         Color = Color3.fromRGB(0, 255, 0),
         IsEnabled = "showCollisionESP"
     })
@@ -390,4 +390,41 @@ end
 
 	end,
 		
+})
+
+local Toggle = MiscTab:CreateToggle({
+   Name = "esp - window",
+   CurrentValue = false,
+   Flag = "toggleexample",
+   Callback = function(Value)
+
+local ESP = loadstring(game:HttpGet("https://Kiriot22.com/releases/ESP.lua"))()
+
+ESP.Players = false
+ESP.Boxes = false
+ESP.Names = true
+ESP:Toggle(true)
+
+-- Флаг включения ESP
+ESP.showCollisionESP = true
+
+-- Подсветка окон Window1–Window30 (если есть UpperCollision)
+for i = 1, 30 do
+    local windowName = "Window" .. i
+    local window = workspace:FindFirstChild(windowName)
+
+    if window and window:FindFirstChild("UpperCollision") then
+        ESP:AddObjectListener(window, {
+            Name = "UpperCollision",
+            CustomName = "Window" .. i,
+            Color = Color3.fromRGB(255, 200, 0),
+            IsEnabled = "showCollisionESP"
+        })
+    else
+        warn("Не найден UpperCollision у " .. windowName)
+    end
+end
+
+	end,
+
 })
