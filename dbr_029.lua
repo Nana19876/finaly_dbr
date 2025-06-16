@@ -835,3 +835,33 @@ end)
 
    end,
 })
+
+local Button1 = TPTab:CreateButton({
+   Name = "jump (space)",
+   Callback = function()
+
+local UserInputService = game:GetService("UserInputService")
+local Players = game:GetService("Players")
+
+local player = Players.LocalPlayer
+local char = player.Character or player.CharacterAdded:Wait()
+local hrp = char:WaitForChild("HumanoidRootPart")
+
+-- Обновляем при респавне
+player.CharacterAdded:Connect(function(c)
+	char = c
+	hrp = char:WaitForChild("HumanoidRootPart")
+end)
+
+-- Прыжок при нажатии R
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+	if gameProcessed then return end
+	if input.KeyCode == Enum.KeyCode.space then
+		-- Подпрыгиваем за счёт вертикальной скорости
+		hrp.Velocity = Vector3.new(hrp.Velocity.X, 60, hrp.Velocity.Z)
+	end
+end)
+
+	end,
+
+})
