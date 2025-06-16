@@ -1,9 +1,11 @@
+-- please stop banned me account, im love DEAD BY ROBLOX! xD
+
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
 local Window = Rayfield:CreateWindow({
-   Name = " Example Script Hub ",
-   LoadingTitle = "🔫 dbr 💥",
-   LoadingSubtitle = "by 1_F0",
+   Name = " DEAD BY ROBLOX! ",
+   LoadingTitle = " dbr ",
+   LoadingSubtitle = "by ScRiPtOmAiN",
    ConfigurationSaving = {
       Enabled = false,
       FolderName = nil, -- Create a custom folder for your hub/game
@@ -573,7 +575,7 @@ end
 })
    
 local MiscTab = Window:CreateTab("misc", nil) -- Title, Image
-local Section = MiscTab:CreateSection("island")
+local Section = MiscTab:CreateSection("for functions to work, click on them once, then just click on the letter next to the function")
 
 local Toggle = MiscTab:CreateToggle({
    Name = "esp - player",
@@ -581,7 +583,7 @@ local Toggle = MiscTab:CreateToggle({
    Flag = "toggleexample",
    Callback = function(Value)
    
-   -- Подключение ESP от Kiriot22
+
 local ESP = loadstring(game:HttpGet("https://Kiriot22.com/releases/ESP.lua"))()
 
 ESP.Players = true            -- отображение игроков
@@ -590,16 +592,16 @@ ESP.Names = true              -- имя
 ESP.TeamCheck = false         
 ESP:Toggle(true)
 
--- Highlight-подсветка игроков вручную
+
 local PlayersService = game:GetService("Players")
 local RunService = game:GetService("RunService")
 
--- Шаблон Highlight
+
 local highlightTemplate = Instance.new("Highlight")
 highlightTemplate.Name = "Highlight"
 highlightTemplate.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
 
--- Функция для добавления Highlight
+
 local function addHighlightToCharacter(character)
     if character and character:FindFirstChild("HumanoidRootPart") then
         local hrp = character:FindFirstChild("HumanoidRootPart")
@@ -611,7 +613,6 @@ local function addHighlightToCharacter(character)
     end
 end
 
--- Добавление Highlight всем текущим игрокам
 for _, player in pairs(PlayersService:GetPlayers()) do
     player.CharacterAdded:Connect(function(char)
         addHighlightToCharacter(char)
@@ -621,14 +622,14 @@ for _, player in pairs(PlayersService:GetPlayers()) do
     end
 end
 
--- Подключение новых игроков
+
 PlayersService.PlayerAdded:Connect(function(player)
     player.CharacterAdded:Connect(function(char)
         addHighlightToCharacter(char)
     end)
 end)
 
--- Удаление Highlight при выходе игрока
+
 PlayersService.PlayerRemoving:Connect(function(player)
     if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
         local hrp = player.Character:FindFirstChild("HumanoidRootPart")
@@ -639,7 +640,7 @@ PlayersService.PlayerRemoving:Connect(function(player)
     end
 end)
 
--- Подстраховка: периодическая проверка на случай, если Highlight не был добавлен
+
 RunService.Heartbeat:Connect(function()
     for _, player in pairs(PlayersService:GetPlayers()) do
         local character = player.Character
@@ -659,7 +660,7 @@ local Toggle = MiscTab:CreateToggle({
    Flag = "espGeneratorToggle",
    Callback = function(Value)
 
-      -- Если ESP ещё не создан, создаём
+     
       if not _G.GeneratorESP then
          _G.GeneratorESP = loadstring(game:HttpGet("https://Kiriot22.com/releases/ESP.lua"))()
          _G.GeneratorESP.Players = false
@@ -667,7 +668,7 @@ local Toggle = MiscTab:CreateToggle({
          _G.GeneratorESP.Names = true
          _G.GeneratorESP.showGeneratorESP = true
 
-         -- Добавляем ObjectListener для генераторов
+         
          for i = 1, 7 do
             local generatorName = "Generator" .. i
             local generator = workspace:FindFirstChild(generatorName)
@@ -685,7 +686,7 @@ local Toggle = MiscTab:CreateToggle({
          end
       end
 
-      -- Включаем или выключаем ESP
+      
       if Value then
          _G.GeneratorESP:Toggle(true)
       else
@@ -701,7 +702,7 @@ local Toggle = MiscTab:CreateToggle({
     Flag = "espPalletToggle",
     Callback = function(Value)
 
-        -- Загружаем ESP один раз
+        
         if not _G.PalletESP then
             local ESP = loadstring(game:HttpGet("https://Kiriot22.com/releases/ESP.lua"))()
 
@@ -711,7 +712,7 @@ local Toggle = MiscTab:CreateToggle({
             ESP.showCollisionESP = true
             ESP:Toggle(true)
 
-            -- Добавляем палеты
+            
             for i = 1, 30 do
                 local palletName = "Pallet" .. i
                 local pallet = workspace:FindFirstChild(palletName)
@@ -731,7 +732,7 @@ local Toggle = MiscTab:CreateToggle({
             _G.PalletESP = ESP
         end
 
-        -- Включение/отключение ESP
+        
         if Value then
             _G.PalletESP:Toggle(true)
         else
@@ -747,7 +748,7 @@ local Toggle = MiscTab:CreateToggle({
     Flag = "espHatchToggle",
     Callback = function(Value)
 
-        -- Загружаем ESP один раз
+        
         if not _G.HatchESP then
             local ESP = loadstring(game:HttpGet("https://Kiriot22.com/releases/ESP.lua"))()
 
@@ -773,7 +774,7 @@ local Toggle = MiscTab:CreateToggle({
             _G.HatchESP = ESP
         end
 
-        -- Включение / выключение ESP
+        
         if _G.HatchESP then
             _G.HatchESP:Toggle(Value)
         end
@@ -786,7 +787,7 @@ local Toggle = MiscTab:CreateToggle({
     Flag = "espWindowToggle",
     Callback = function(Value)
 
-        -- Загружаем ESP один раз
+        
         if not _G.WindowESP then
             local ESP = loadstring(game:HttpGet("https://Kiriot22.com/releases/ESP.lua"))()
 
@@ -816,7 +817,7 @@ local Toggle = MiscTab:CreateToggle({
             _G.WindowESP = ESP
         end
 
-        -- Включение / отключение ESP
+        
         if _G.WindowESP then
             _G.WindowESP:Toggle(Value)
         end
@@ -830,7 +831,7 @@ local Toggle = MiscTab:CreateToggle({
     Flag = "espTrapToggle",
     Callback = function(Value)
 
-        -- Загружаем ESP один раз
+        
         if not _G.TrapESP then
             local ESP = loadstring(game:HttpGet("https://Kiriot22.com/releases/ESP.lua"))()
 
@@ -1054,7 +1055,7 @@ local dashDistance = 10         -- Дистанция рывка
 local dashCooldown = 0          -- Перезарядка (в секундах)
 local lastDash = 0              -- Время последнего рывка
 
--- Обновляем персонажа
+
 local char = player.Character or player.CharacterAdded:Wait()
 local hrp = char:WaitForChild("HumanoidRootPart")
 
@@ -1063,7 +1064,7 @@ player.CharacterAdded:Connect(function(c)
 	hrp = c:WaitForChild("HumanoidRootPart")
 end)
 
--- Обработка клавиши E
+
 UserInputService.InputBegan:Connect(function(input, gp)
 	if gp or input.KeyCode ~= Enum.KeyCode.E then return end
 
@@ -1097,31 +1098,31 @@ local player = Players.LocalPlayer
 local char = player.Character or player.CharacterAdded:Wait()
 local hrp = char:WaitForChild("HumanoidRootPart")
 
--- Обновляем при респавне
+
 player.CharacterAdded:Connect(function(c)
 	char = c
 	hrp = c:WaitForChild("HumanoidRootPart")
 end)
 
--- Настройка скорости
+
 local walkBoostSpeed = 0.5 -- 0.3–0.7 безопасно
 local isMovingForward = false
 
--- Нажатие клавиши W
+
 UserInputService.InputBegan:Connect(function(input, gp)
 	if not gp and input.KeyCode == Enum.KeyCode.W then
 		isMovingForward = true
 	end
 end)
 
--- Отпускание клавиши W
+
 UserInputService.InputEnded:Connect(function(input, gp)
 	if input.KeyCode == Enum.KeyCode.W then
 		isMovingForward = false
 	end
 end)
 
--- Плавное движение вперёд
+
 RunService.RenderStepped:Connect(function()
 	if isMovingForward and hrp then
 		local direction = hrp.CFrame.LookVector
@@ -1144,18 +1145,19 @@ local player = Players.LocalPlayer
 local char = player.Character or player.CharacterAdded:Wait()
 local hrp = char:WaitForChild("HumanoidRootPart")
 
--- Обновляем при респавне
+
 player.CharacterAdded:Connect(function(c)
 	char = c
 	hrp = char:WaitForChild("HumanoidRootPart")
 end)
 
--- Прыжок при нажатии R
+			
 UserInputService.InputBegan:Connect(function(input, gameProcessed)
 	if gameProcessed then return end
-	if input.KeyCode == Enum.KeyCode.space then
-		-- Подпрыгиваем за счёт вертикальной скорости
+	if input.KeyCode == Enum.KeyCode.Space then
+
 		hrp.Velocity = Vector3.new(hrp.Velocity.X, 60, hrp.Velocity.Z)
+
 	end
 end)
 
@@ -1177,7 +1179,7 @@ local camera = Workspace.CurrentCamera
 local trackingEnabled = false
 local trackedPlayer = nil
 
--- Функция для поиска игрока с командой "Killer"
+
 local function findKillerPlayer()
 	for _, player in pairs(Players:GetPlayers()) do
 		if player ~= localPlayer and player.Team and player.Team.Name == "Killer" then
@@ -1187,7 +1189,7 @@ local function findKillerPlayer()
 	return nil
 end
 
--- Включить слежение
+
 local function startTracking()
 	trackedPlayer = findKillerPlayer()
 	if trackedPlayer and trackedPlayer.Character and trackedPlayer.Character:FindFirstChild("Humanoid") then
@@ -1196,12 +1198,12 @@ local function startTracking()
 	end
 end
 
--- Отключить слежение
+
 local function stopTracking()
 	camera.CameraSubject = localPlayer.Character and localPlayer.Character:FindFirstChild("Humanoid")
 end
 
--- Обработка клавиши (например, "K")
+
 UserInputService.InputBegan:Connect(function(input, gameProcessed)
 	if gameProcessed then return end
 	if input.KeyCode == Enum.KeyCode.K then
@@ -1235,7 +1237,6 @@ local following = false
 local connection = nil
 local killerCharacter = nil
 
--- Ищем игрока с командой "Killer"
 local function findKiller()
 	for _, player in pairs(Players:GetPlayers()) do
 		if player ~= localPlayer and player.Team and player.Team.Name == "Killer" then
@@ -1245,7 +1246,7 @@ local function findKiller()
 	return nil
 end
 
--- Включаем зависание
+
 local function startFollowing()
 	killerCharacter = findKiller()
 	if not killerCharacter or not killerCharacter:FindFirstChild("HumanoidRootPart") then return end
@@ -1258,7 +1259,7 @@ local function startFollowing()
 	end)
 end
 
--- Выключаем зависание
+
 local function stopFollowing()
 	if connection then
 		connection:Disconnect()
@@ -1267,7 +1268,7 @@ local function stopFollowing()
 	killerCharacter = nil
 end
 
--- Обработка нажатия клавиши Z
+
 UserInputService.InputBegan:Connect(function(input, gp)
 	if gp then return end
 	if input.KeyCode == Enum.KeyCode.Z then
