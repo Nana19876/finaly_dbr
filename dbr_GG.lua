@@ -4,12 +4,12 @@ local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
 local Window = Rayfield:CreateWindow({
    Name = " DEAD BY ROBLOX! ",
-   LoadingTitle = " dbr ",
+   LoadingTitle = " DEAD BY ROBLOX ",
    LoadingSubtitle = "by ScRiPtOmAiN",
    ConfigurationSaving = {
       Enabled = false,
       FolderName = nil, -- Create a custom folder for your hub/game
-      FileName = "Example Hub"
+      FileName = "DEAD BY ROBLOX"
    },
    Discord = {
       Enabled = false,
@@ -575,7 +575,7 @@ end
 })
    
 local MiscTab = Window:CreateTab("misc", nil) -- Title, Image
-local Section = MiscTab:CreateSection("for functions to work, click on them once, then just click on the letter next to the function")
+local Section = MiscTab:CreateSection("esp")
 
 local Toggle = MiscTab:CreateToggle({
    Name = "esp - player",
@@ -963,6 +963,8 @@ local Toggle = MiscTab:CreateToggle({
 
 			
 local TPTab = Window:CreateTab("defolt", nil) -- Title, Image
+local Section = defoltTab:CreateSection("for functions to work, click on them once, then just click on the letter next to the function")
+
 
 local Button1 = TPTab:CreateButton({
    Name = "noclip (V)",
