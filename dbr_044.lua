@@ -429,10 +429,6 @@ local Toggle = MiscTab:CreateToggle({
             for _,plr in pairs(Players:GetPlayers()) do
                 if plr.Character then
                     _G.PlayerESP.remover(plr.Character)
-                end
-            end
-        end
-    end
 
 	end,
 	
