@@ -593,36 +593,42 @@ end
 local Toggle = MiscTab:CreateToggle({
    Name = "esp - totem",
    CurrentValue = false,
-   Flag = "toggleexample",
+   Flag = "espTotemToggle",
    Callback = function(Value)
+      -- Загружаем ESP один раз (если ещё не загружен)
+      if not _G.TotemESP then
+         _G.TotemESP = loadstring(game:HttpGet("https://Kiriot22.com/releases/ESP.lua"))()
+         _G.TotemESP.Players = false
+         _G.TotemESP.Boxes = false
+         _G.TotemESP.Names = true
+         _G.TotemESP.showCollisionESP = true
+         _G.TotemESP:Toggle(true)
 
-local ESP = loadstring(game:HttpGet("https://Kiriot22.com/releases/ESP.lua"))()
+         -- Добавляем подсветку для Totem1–Totem7
+         for i = 1, 7 do
+            local totemName = "Totem" .. i
+            local totem = workspace:FindFirstChild(totemName)
 
-ESP.Players = false
-ESP.Boxes = false
-ESP.Names = true
-ESP:Toggle(true)
+            if totem then
+               _G.TotemESP:AddObjectListener(workspace, {
+                  Name = totemName,
+                  CustomName = "Totem" .. i,
+                  Color = Color3.fromRGB(208, 225, 241),
+                  IsEnabled = "showCollisionESP"
+               })
+            else
+               warn("Объект " .. totemName .. " не найден")
+            end
+         end
+      end
 
--- Флаг включения ESP
-ESP.showCollisionESP = true
-
--- Подсветка Totem1–Totem7
-for i = 1, 7 do
-    local totemName = "Totem" .. i
-    local totem = workspace:FindFirstChild(totemName)
-
-    if totem then
-        ESP:AddObjectListener(workspace, {
-            Name = totemName,
-            CustomName = "Totem" .. i,
-            Color = Color3.fromRGB(208, 225, 241), -- голубой цвет для тотемов
-            IsEnabled = "showCollisionESP"
-        })
-    else
-        warn("Объект " .. totemName .. " не найден")
-    end
-end
-
+      -- Включение / выключение ESP
+      if Value then
+         _G.TotemESP:Toggle(true)
+      else
+         _G.TotemESP:Toggle(false)
+      end
+			
 	end,
 
 })
