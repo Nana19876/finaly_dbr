@@ -988,3 +988,17 @@ end)
 	end,
 
 })
+
+local FOVSlider = TPTab:CreateSlider({
+   Name = "FOV (L+R)",
+   Range = {60, 120},
+   Increment = 1,
+   Suffix = "FOV",
+   CurrentValue = camera.FieldOfView,
+   Callback = function(value)
+			
+	camera.FieldOfView = value
+			
+	end,
+		
+})
