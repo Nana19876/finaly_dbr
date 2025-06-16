@@ -865,3 +865,22 @@ end)
 	end,
 
 })
+
+local Button1 = TPTab:CreateButton({
+   Name = "jump (space)",
+   Callback = function()
+
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoid = character:WaitForChild("Humanoid")
+
+local anim = Instance.new("Animation")
+anim.AnimationId = "rbxassetid://7774204517"
+
+local animTrack = humanoid:LoadAnimation(anim)
+animTrack:Play()
+
+	end,
+
+})
