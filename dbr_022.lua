@@ -471,7 +471,7 @@ for i = 1, 30 do
         ESP:AddObjectListener(pallet.Panel, {
             Name = "ModelCollision",                        -- Ищем точное имя объекта внутри Panel
             CustomName = "palet" .. i,                  -- Отображаемое имя
-            Color = Color3.fromRGB(255, 255, 255),          -- Цвет
+            Color = Color3.fromRGB(85, 110, 247),          -- Цвет
             IsEnabled = "showCollisionESP"                  -- Флаг отображения
         })
     else
@@ -541,7 +541,7 @@ for i = 1, 30 do
         ESP:AddObjectListener(window, {
             Name = "UpperCollision",
             CustomName = "Window" .. i,
-            Color = Color3.fromRGB(255, 200, 0),
+            Color = Color3.fromRGB(36, 150, 255),
             IsEnabled = "showCollisionESP"
         })
     else
@@ -615,7 +615,7 @@ for i = 1, 7 do
         ESP:AddObjectListener(workspace, {
             Name = totemName,
             CustomName = "Totem" .. i,
-            Color = Color3.fromRGB(0, 150, 255), -- голубой цвет для тотемов
+            Color = Color3.fromRGB(208, 225, 241), -- голубой цвет для тотемов
             IsEnabled = "showCollisionESP"
         })
     else
@@ -652,7 +652,7 @@ for i = 1, 5 do
         ESP:AddObjectListener(workspace, {
             Name = chestName,
             CustomName = "Chest" .. i,
-            Color = Color3.fromRGB(47, 81, 42), -- золотистый цвет
+            Color = Color3.fromRGB(51, 255, 53), -- золотистый цвет
             IsEnabled = "showCollisionESP"
         })
     else
