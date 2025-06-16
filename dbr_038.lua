@@ -999,6 +999,7 @@ local Slider = TPTab:CreateSlider({
    CurrentValue = camera.FieldOfView,
    Callback = function(Value)
       camera.FieldOfView = math.clamp(Value, 60, 120)
+			
    end
 		
 	end,
