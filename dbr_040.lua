@@ -905,6 +905,25 @@ animTrack:Play()
 })
 
 local Button1 = TPTab:CreateButton({
+   Name = "animation (Send Wave)",
+   Callback = function()
+
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoid = character:WaitForChild("Humanoid")
+
+local anim = Instance.new("Animation")
+anim.AnimationId = "rbxassetid://94996092165026"
+
+local animTrack = humanoid:LoadAnimation(anim)
+animTrack:Play()
+
+	end,
+
+})
+
+local Button1 = TPTab:CreateButton({
    Name = "animation (stun)",
    Callback = function()
 
@@ -915,6 +934,25 @@ local humanoid = character:WaitForChild("Humanoid")
 
 local anim = Instance.new("Animation")
 anim.AnimationId = "rbxassetid://13415621385"
+
+local animTrack = humanoid:LoadAnimation(anim)
+animTrack:Play()
+
+	end,
+
+})
+
+local Button1 = TPTab:CreateButton({
+   Name = "animation (SearchChest)",
+   Callback = function()
+
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoid = character:WaitForChild("Humanoid")
+
+local anim = Instance.new("Animation")
+anim.AnimationId = "rbxassetid://14674639669"
 
 local animTrack = humanoid:LoadAnimation(anim)
 animTrack:Play()
