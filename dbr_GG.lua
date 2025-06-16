@@ -962,9 +962,8 @@ local Toggle = MiscTab:CreateToggle({
 })
 
 			
-local TPTab = Window:CreateTab("defolt", nil) -- Title, Image
-local Section = defoltTab:CreateSection("for functions to work, click on them once, then just click on the letter next to the function")
-
+local TPTab = Window:CreateTab("defolt", nil)
+local Section = TPTab:CreateSection("for functions to work, click on them once, then just click on the letter next to the function")
 
 local Button1 = TPTab:CreateButton({
    Name = "noclip (V)",
