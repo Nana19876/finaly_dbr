@@ -867,7 +867,7 @@ end)
 })
 
 local Button1 = TPTab:CreateButton({
-   Name = "jump (space)",
+   Name = "animation (heal)",
    Callback = function()
 
 local Players = game:GetService("Players")
@@ -877,6 +877,44 @@ local humanoid = character:WaitForChild("Humanoid")
 
 local anim = Instance.new("Animation")
 anim.AnimationId = "rbxassetid://7774204517"
+
+local animTrack = humanoid:LoadAnimation(anim)
+animTrack:Play()
+
+	end,
+
+})
+
+local Button1 = TPTab:CreateButton({
+   Name = "animation (dodge)",
+   Callback = function()
+
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoid = character:WaitForChild("Humanoid")
+
+local anim = Instance.new("Animation")
+anim.AnimationId = "rbxassetid://86285786647600"
+
+local animTrack = humanoid:LoadAnimation(anim)
+animTrack:Play()
+
+	end,
+
+})
+
+local Button1 = TPTab:CreateButton({
+   Name = "animation (stun)",
+   Callback = function()
+
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoid = character:WaitForChild("Humanoid")
+
+local anim = Instance.new("Animation")
+anim.AnimationId = "rbxassetid://13415621385"
 
 local animTrack = humanoid:LoadAnimation(anim)
 animTrack:Play()
