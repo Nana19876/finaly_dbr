@@ -989,28 +989,18 @@ end)
 
 })
 
+local camera = workspace.CurrentCamera
+
 local Slider = TPTab:CreateSlider({
    Name = "FOV",
    Range = {60, 120},
    Increment = 1,
    Suffix = "fov",
-   CurrentValue = 60,
+   CurrentValue = camera.FieldOfView,
    Callback = function(Value)
-
-local camera = workspace.CurrentCamera
-
--- Границы FOV
-local MIN_FOV, MAX_FOV = 60, 120
-
--- Функция-обёртка: безопасно задаёт угол обзора
-local function setFOV(value)
-    camera.FieldOfView = math.clamp(value, MIN_FOV, MAX_FOV)
-end
-
--- Пример вызова: можно подключить к Rayfield-слайдеру
--- setFOV(90)
-
-			
-	end,
+      camera.FieldOfView = math.clamp(Value, 60, 120)
+   end
 		
+	end,
+	
 })
