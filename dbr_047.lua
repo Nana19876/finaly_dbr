@@ -47,7 +47,20 @@ Rayfield:Notify({
 local Button = MainTab:CreateButton({
    Name = "Generator1",
    Callback = function()
-   game:GetService("Workspace").KateOnFire1.HumanoidRootPart.CFrame = game:GetService("Workspace").Generator1.RootPart.CFrame
+			
+   local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+
+local HRP = Character:WaitForChild("HumanoidRootPart")
+local Target = workspace:FindFirstChild("Generator1")
+
+if Target and Target:FindFirstChild("RootPart") then
+    HRP.CFrame = Target.RootPart.CFrame
+else
+    warn("Generator1.RootPart не найден")
+end
+
 
    end,
    
@@ -56,7 +69,20 @@ local Button = MainTab:CreateButton({
 local Button = MainTab:CreateButton({
    Name = "Generator2",
    Callback = function()
-   game:GetService("Workspace").KateOnFire1.HumanoidRootPart.CFrame = game:GetService("Workspace").Generator2.RootPart.CFrame
+			
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+
+local HRP = Character:WaitForChild("HumanoidRootPart")
+local Target = workspace:FindFirstChild("Generator2")
+
+if Target and Target:FindFirstChild("RootPart") then
+    HRP.CFrame = Target.RootPart.CFrame
+else
+    warn("Generator2.RootPart не найден")
+end
+
    
    end,
 
@@ -65,7 +91,20 @@ local Button = MainTab:CreateButton({
 local Button = MainTab:CreateButton({
    Name = "Generator3",
    Callback = function()
-   game:GetService("Workspace").KateOnFire1.HumanoidRootPart.CFrame = game:GetService("Workspace").Generator3.RootPart.CFrame
+			
+   local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+
+local HRP = Character:WaitForChild("HumanoidRootPart")
+local Target = workspace:FindFirstChild("Generator3")
+
+if Target and Target:FindFirstChild("RootPart") then
+    HRP.CFrame = Target.RootPart.CFrame
+else
+    warn("Generator3.RootPart не найден")
+end
+
    
    end,
 
@@ -74,7 +113,20 @@ local Button = MainTab:CreateButton({
 local Button = MainTab:CreateButton({
    Name = "Generator4",
    Callback = function()
-   game:GetService("Workspace").KateOnFire1.HumanoidRootPart.CFrame = game:GetService("Workspace").Generator4.RootPart.CFrame
+			
+   local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+
+local HRP = Character:WaitForChild("HumanoidRootPart")
+local Target = workspace:FindFirstChild("Generator4")
+
+if Target and Target:FindFirstChild("RootPart") then
+    HRP.CFrame = Target.RootPart.CFrame
+else
+    warn("Generator4.RootPart не найден")
+end
+
    
    end,
 
@@ -83,7 +135,20 @@ local Button = MainTab:CreateButton({
 local Button = MainTab:CreateButton({
    Name = "Generator5",
    Callback = function()
-   game:GetService("Workspace").KateOnFire1.HumanoidRootPart.CFrame = game:GetService("Workspace").Generator5.RootPart.CFrame
+			
+  local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+
+local HRP = Character:WaitForChild("HumanoidRootPart")
+local Target = workspace:FindFirstChild("Generator5")
+
+if Target and Target:FindFirstChild("RootPart") then
+    HRP.CFrame = Target.RootPart.CFrame
+else
+    warn("Generator5.RootPart не найден")
+end
+
    
    end,
 
@@ -92,8 +157,20 @@ local Button = MainTab:CreateButton({
 local Button = MainTab:CreateButton({
    Name = "Generator6",
    Callback = function()
-   game:GetService("Workspace").KateOnFire1.HumanoidRootPart.CFrame = game:GetService("Workspace").Generator6.RootPart.CFrame
-   
+			
+   local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+
+local HRP = Character:WaitForChild("HumanoidRootPart")
+local Target = workspace:FindFirstChild("Generator6")
+
+if Target and Target:FindFirstChild("RootPart") then
+    HRP.CFrame = Target.RootPart.CFrame
+else
+    warn("Generator6.RootPart не найден")
+end
+
    end,
 
 })
@@ -101,7 +178,20 @@ local Button = MainTab:CreateButton({
 local Button = MainTab:CreateButton({
    Name = "Generator7",
    Callback = function()
-   game:GetService("Workspace").KateOnFire1.HumanoidRootPart.CFrame = game:GetService("Workspace").Generator7.RootPart.CFrame
+			
+   local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+
+local HRP = Character:WaitForChild("HumanoidRootPart")
+local Target = workspace:FindFirstChild("Generator7")
+
+if Target and Target:FindFirstChild("RootPart") then
+    HRP.CFrame = Target.RootPart.CFrame
+else
+    warn("Generator7.RootPart не найден")
+end
+
    
    end,
 
@@ -111,7 +201,14 @@ local Button = MainTab:CreateButton({
    Name = "reward",
    Callback = function()
    
-   game:GetService("Workspace").KateOnFire1.HumanoidRootPart.CFrame = game:GetService("Workspace").Lobby.Obby.Reward.CFrame
+   local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local HRP = Character:WaitForChild("HumanoidRootPart")
+
+local target = workspace:WaitForChild("Lobby"):WaitForChild("Obby"):WaitForChild("Reward")
+
+HRP.CFrame = target.CFrame
    
    end,
 
@@ -188,13 +285,24 @@ end
 local Button = MainTab:CreateButton({
    Name = "killer",
    Callback = function()
-   
-   local localPlayer = game:GetService("Players").LocalPlayer
+local localPlayer = game:GetService("Players").LocalPlayer
 local character = localPlayer.Character or localPlayer.CharacterAdded:Wait()
+local hrp = character:WaitForChild("HumanoidRootPart")
 
-local killer = workspace:FindFirstChild("Killer")
+-- Ищем объект с ClassName "Killer"
+local killer
+for _, obj in ipairs(workspace:GetDescendants()) do
+    if obj.ClassName == "Killer" then
+        killer = obj
+        break
+    end
+end
+
+-- Телепорт к HumanoidRootPart киллера
 if killer and killer:FindFirstChild("HumanoidRootPart") then
-    character:WaitForChild("HumanoidRootPart").CFrame = killer.HumanoidRootPart.CFrame + Vector3.new(0, 3, 0)
+    hrp.CFrame = killer.HumanoidRootPart.CFrame + Vector3.new(0, 3, 0)
+else
+    warn("Объект с классом Killer или его HumanoidRootPart не найден")
 end
 
 	end,
@@ -205,7 +313,18 @@ local Button = MainTab:CreateButton({
    Name = "hatch",
    Callback = function()
 
-game:GetService("Workspace").KateOnFire1.HumanoidRootPart.CFrame = game:GetService("Workspace").Hatch.Visual.Rim.CFrame
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local HRP = Character:WaitForChild("HumanoidRootPart")
+
+local hatch = workspace:FindFirstChild("Hatch")
+if hatch and hatch:FindFirstChild("Visual") and hatch.Visual:FindFirstChild("Rim") then
+    HRP.CFrame = hatch.Visual.Rim.CFrame
+else
+    warn("Hatch.Visual.Rim не найден")
+end
+
 
 	end,
 
@@ -215,7 +334,19 @@ local Button = MainTab:CreateButton({
    Name = "totem1",
    Callback = function()
 
-game:GetService("Workspace").KateOnFire1.HumanoidRootPart.CFrame = workspace.Totem1.PrimaryPart.CFrame
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local HRP = Character:WaitForChild("HumanoidRootPart")
+
+local totem = workspace:FindFirstChild("Totem1")
+
+if totem and totem.PrimaryPart then
+    HRP.CFrame = totem.PrimaryPart.CFrame
+else
+    warn("Totem1 или его PrimaryPart не найден")
+end
+
 
 	end,
 
@@ -225,7 +356,18 @@ local Button = MainTab:CreateButton({
    Name = "totem2",
    Callback = function()
 
-game:GetService("Workspace").KateOnFire1.HumanoidRootPart.CFrame = workspace.Totem2.PrimaryPart.CFrame
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local HRP = Character:WaitForChild("HumanoidRootPart")
+
+local totem = workspace:FindFirstChild("Totem2")
+
+if totem and totem.PrimaryPart then
+    HRP.CFrame = totem.PrimaryPart.CFrame
+else
+    warn("Totem2 или его PrimaryPart не найден")
+end
 
 	end,
 
@@ -235,7 +377,18 @@ local Button = MainTab:CreateButton({
    Name = "totem3",
    Callback = function()
 
-game:GetService("Workspace").KateOnFire1.HumanoidRootPart.CFrame = workspace.Totem3.PrimaryPart.CFrame
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local HRP = Character:WaitForChild("HumanoidRootPart")
+
+local totem = workspace:FindFirstChild("Totem3")
+
+if totem and totem.PrimaryPart then
+    HRP.CFrame = totem.PrimaryPart.CFrame
+else
+    warn("Totem3 или его PrimaryPart не найден")
+end
 
 	end,
 
@@ -245,7 +398,19 @@ local Button = MainTab:CreateButton({
    Name = "totem4",
    Callback = function()
 
-game:GetService("Workspace").KateOnFire1.HumanoidRootPart.CFrame = workspace.Totem4.PrimaryPart.CFrame
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local HRP = Character:WaitForChild("HumanoidRootPart")
+
+local totem = workspace:FindFirstChild("Totem4")
+
+if totem and totem.PrimaryPart then
+    HRP.CFrame = totem.PrimaryPart.CFrame
+else
+    warn("Totem4 или его PrimaryPart не найден")
+end
+
 
 	end,
 
@@ -255,7 +420,19 @@ local Button = MainTab:CreateButton({
    Name = "totem5",
    Callback = function()
 
-game:GetService("Workspace").KateOnFire1.HumanoidRootPart.CFrame = workspace.Totem5.PrimaryPart.CFrame
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local HRP = Character:WaitForChild("HumanoidRootPart")
+
+local totem = workspace:FindFirstChild("Totem5")
+
+if totem and totem.PrimaryPart then
+    HRP.CFrame = totem.PrimaryPart.CFrame
+else
+    warn("Totem5 или его PrimaryPart не найден")
+end
+
 
 	end,
 
@@ -265,7 +442,19 @@ local Button = MainTab:CreateButton({
    Name = "totem6",
    Callback = function()
 
-game:GetService("Workspace").KateOnFire1.HumanoidRootPart.CFrame = workspace.Totem6.PrimaryPart.CFrame
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local HRP = Character:WaitForChild("HumanoidRootPart")
+
+local totem = workspace:FindFirstChild("Totem6")
+
+if totem and totem.PrimaryPart then
+    HRP.CFrame = totem.PrimaryPart.CFrame
+else
+    warn("Totem6 или его PrimaryPart не найден")
+end
+
 
 	end,
 
@@ -275,7 +464,19 @@ local Button = MainTab:CreateButton({
    Name = "сhest1",
    Callback = function()
 
-game:GetService("Workspace").KateOnFire1.HumanoidRootPart.CFrame = workspace.Chest1.PrimaryPart.CFrame
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local HRP = Character:WaitForChild("HumanoidRootPart")
+
+local chest = workspace:FindFirstChild("Chest1")
+
+if chest and chest.PrimaryPart then
+    HRP.CFrame = chest.PrimaryPart.CFrame
+else
+    warn("Chest1 или его PrimaryPart не найден")
+end
+
 
 
 	end,
@@ -286,7 +487,19 @@ local Button = MainTab:CreateButton({
    Name = "сhest2",
    Callback = function()
 
-game:GetService("Workspace").KateOnFire1.HumanoidRootPart.CFrame = workspace.Chest2.PrimaryPart.CFrame
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local HRP = Character:WaitForChild("HumanoidRootPart")
+
+local chest = workspace:FindFirstChild("Chest2")
+
+if chest and chest.PrimaryPart then
+    HRP.CFrame = chest.PrimaryPart.CFrame
+else
+    warn("Chest2 или его PrimaryPart не найден")
+end
+
 
 
 	end,
@@ -297,7 +510,18 @@ local Button = MainTab:CreateButton({
    Name = "сhest3",
    Callback = function()
 
-game:GetService("Workspace").KateOnFire1.HumanoidRootPart.CFrame = workspace.Chest3.PrimaryPart.CFrame
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local HRP = Character:WaitForChild("HumanoidRootPart")
+
+local chest = workspace:FindFirstChild("Chest3")
+
+if chest and chest.PrimaryPart then
+    HRP.CFrame = chest.PrimaryPart.CFrame
+else
+    warn("Chest3 или его PrimaryPart не найден")
+end
 
 
 	end,
@@ -308,7 +532,18 @@ local Button = MainTab:CreateButton({
    Name = "сhest4",
    Callback = function()
 
-game:GetService("Workspace").KateOnFire1.HumanoidRootPart.CFrame = workspace.Chest4.PrimaryPart.CFrame
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local HRP = Character:WaitForChild("HumanoidRootPart")
+
+local chest = workspace:FindFirstChild("Chest4")
+
+if chest and chest.PrimaryPart then
+    HRP.CFrame = chest.PrimaryPart.CFrame
+else
+    warn("Chest4 или его PrimaryPart не найден")
+end
 
 
 	end,
@@ -319,7 +554,18 @@ local Button = MainTab:CreateButton({
    Name = "сhest5",
    Callback = function()
 
-game:GetService("Workspace").KateOnFire1.HumanoidRootPart.CFrame = workspace.Chest5.PrimaryPart.CFrame
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local HRP = Character:WaitForChild("HumanoidRootPart")
+
+local chest = workspace:FindFirstChild("Chest5")
+
+if chest and chest.PrimaryPart then
+    HRP.CFrame = chest.PrimaryPart.CFrame
+else
+    warn("Chest5 или его PrimaryPart не найден")
+end
 
 
 	end,
@@ -338,10 +584,10 @@ local Toggle = MiscTab:CreateToggle({
    -- Подключение ESP от Kiriot22
 local ESP = loadstring(game:HttpGet("https://Kiriot22.com/releases/ESP.lua"))()
 
-ESP.Players = true            -- Включаем отображение игроков
-ESP.Boxes = true              -- Показываем коробку
-ESP.Names = true              -- Показываем имя
-ESP.TeamCheck = false         -- Показывать всех, даже тиммейтов
+ESP.Players = true            -- отображение игроков
+ESP.Boxes = true              -- коробка
+ESP.Names = true              -- имя
+ESP.TeamCheck = false         
 ESP:Toggle(true)
 
 -- Highlight-подсветка игроков вручную
@@ -450,148 +696,177 @@ local Toggle = MiscTab:CreateToggle({
 
 
 local Toggle = MiscTab:CreateToggle({
-   Name = "esp - pallet",
-   CurrentValue = false,
-   Flag = "toggleexample",
-   Callback = function(Value)
+    Name = "esp - pallet",
+    CurrentValue = false,
+    Flag = "espPalletToggle",
+    Callback = function(Value)
 
-local ESP = loadstring(game:HttpGet("https://Kiriot22.com/releases/ESP.lua"))()
+        -- Загружаем ESP один раз
+        if not _G.PalletESP then
+            local ESP = loadstring(game:HttpGet("https://Kiriot22.com/releases/ESP.lua"))()
 
-ESP.Players = false
-ESP.Boxes = false
-ESP.Names = true
-ESP:Toggle(true)
+            ESP.Players = false
+            ESP.Boxes = false
+            ESP.Names = true
+            ESP.showCollisionESP = true
+            ESP:Toggle(true)
 
--- Флаг включения ESP
-ESP.showCollisionESP = true
+            -- Добавляем палеты
+            for i = 1, 30 do
+                local palletName = "Pallet" .. i
+                local pallet = workspace:FindFirstChild(palletName)
 
--- Добавление ObjectListener для всех палет
-for i = 1, 30 do
-    local palletName = "Pallet" .. i
-    local pallet = workspace:FindFirstChild(palletName)
+                if pallet and pallet:FindFirstChild("Panel") then
+                    ESP:AddObjectListener(pallet.Panel, {
+                        Name = "ModelCollision",
+                        CustomName = "Pallet" .. i,
+                        Color = Color3.fromRGB(85, 110, 247),
+                        IsEnabled = "showCollisionESP"
+                    })
+                else
+                    warn("Не найдена панель у " .. palletName)
+                end
+            end
 
-    if pallet and pallet:FindFirstChild("Panel") then
-        ESP:AddObjectListener(pallet.Panel, {
-            Name = "ModelCollision",                        -- Ищем точное имя объекта внутри Panel
-            CustomName = "palet" .. i,                  -- Отображаемое имя
-            Color = Color3.fromRGB(85, 110, 247),          -- Цвет
-            IsEnabled = "showCollisionESP"                  -- Флаг отображения
-        })
-    else
-        warn("Не найдена панель у " .. palletName)
+            _G.PalletESP = ESP
+        end
+
+        -- Включение/отключение ESP
+        if Value then
+            _G.PalletESP:Toggle(true)
+        else
+            _G.PalletESP:Toggle(false)
+        end
     end
-end
-   
-   	end,
-	
+})
+
+
+local Toggle = MiscTab:CreateToggle({
+    Name = "esp - hatch",
+    CurrentValue = false,
+    Flag = "espHatchToggle",
+    Callback = function(Value)
+
+        -- Загружаем ESP один раз
+        if not _G.HatchESP then
+            local ESP = loadstring(game:HttpGet("https://Kiriot22.com/releases/ESP.lua"))()
+
+            ESP.Players = false
+            ESP.Boxes = false
+            ESP.Names = true
+            ESP.showCollisionESP = true
+            ESP:Toggle(true)
+
+            -- Подсветка Hatch.Visual.Rim
+            local hatch = workspace:FindFirstChild("Hatch")
+            if hatch and hatch:FindFirstChild("Visual") and hatch.Visual:FindFirstChild("Rim") then
+                ESP:AddObjectListener(hatch.Visual, {
+                    Name = "Rim",
+                    CustomName = "Hatch",
+                    Color = Color3.fromRGB(0, 255, 0),
+                    IsEnabled = "showCollisionESP"
+                })
+            else
+                warn("Объект Hatch.Visual.Rim не найден")
+            end
+
+            _G.HatchESP = ESP
+        end
+
+        -- Включение / выключение ESP
+        if _G.HatchESP then
+            _G.HatchESP:Toggle(Value)
+        end
+    end
 })
 
 local Toggle = MiscTab:CreateToggle({
-   Name = "esp - hatch",
-   CurrentValue = false,
-   Flag = "toggleexample",
-   Callback = function(Value)
+    Name = "esp - window",
+    CurrentValue = false,
+    Flag = "espWindowToggle",
+    Callback = function(Value)
 
-local ESP = loadstring(game:HttpGet("https://Kiriot22.com/releases/ESP.lua"))()
+        -- Загружаем ESP один раз
+        if not _G.WindowESP then
+            local ESP = loadstring(game:HttpGet("https://Kiriot22.com/releases/ESP.lua"))()
 
-ESP.Players = false
-ESP.Boxes = false
-ESP.Names = true
-ESP:Toggle(true)
+            ESP.Players = false
+            ESP.Boxes = false
+            ESP.Names = true
+            ESP.showCollisionESP = true
+            ESP:Toggle(true)
 
--- Флаг включения ESP
-ESP.showCollisionESP = true
+            -- Подсветка окон Window1–Window30 (если есть UpperCollision)
+            for i = 1, 30 do
+                local windowName = "Window" .. i
+                local window = workspace:FindFirstChild(windowName)
 
--- Подсветка объекта Hatch.Visual.Rim
-local rimPath = game:GetService("Workspace"):FindFirstChild("Hatch")
-if rimPath and rimPath:FindFirstChild("Visual") and rimPath.Visual:FindFirstChild("Rim") then
-    ESP:AddObjectListener(rimPath.Visual, {
-        Name = "Rim",
-        CustomName = "Hatch",
-        Color = Color3.fromRGB(0, 255, 0),
-        IsEnabled = "showCollisionESP"
-    })
-else
-    warn("Объект Hatch.Visual.Rim не найден")
-end
+                if window and window:FindFirstChild("UpperCollision") then
+                    ESP:AddObjectListener(window, {
+                        Name = "UpperCollision",
+                        CustomName = "Window" .. i,
+                        Color = Color3.fromRGB(36, 150, 255),
+                        IsEnabled = "showCollisionESP"
+                    })
+                else
+                    warn("Не найден UpperCollision у " .. windowName)
+                end
+            end
 
-	end,
-		
+            _G.WindowESP = ESP
+        end
+
+        -- Включение / отключение ESP
+        if _G.WindowESP then
+            _G.WindowESP:Toggle(Value)
+        end
+    end
 })
+
 
 local Toggle = MiscTab:CreateToggle({
-   Name = "esp - window",
-   CurrentValue = false,
-   Flag = "toggleexample",
-   Callback = function(Value)
+    Name = "esp - trap",
+    CurrentValue = false,
+    Flag = "espTrapToggle",
+    Callback = function(Value)
 
-local ESP = loadstring(game:HttpGet("https://Kiriot22.com/releases/ESP.lua"))()
+        -- Загружаем ESP один раз
+        if not _G.TrapESP then
+            local ESP = loadstring(game:HttpGet("https://Kiriot22.com/releases/ESP.lua"))()
 
-ESP.Players = false
-ESP.Boxes = false
-ESP.Names = true
-ESP:Toggle(true)
+            ESP.Players = false
+            ESP.Boxes = false
+            ESP.Names = true
+            ESP.showCollisionESP = true
+            ESP:Toggle(true)
 
--- Флаг включения ESP
-ESP.showCollisionESP = true
+            -- Подсветка объектов Trap1–Trap7
+            for i = 1, 7 do
+                local trapName = "Trap" .. i
+                local trap = workspace:FindFirstChild(trapName)
 
--- Подсветка окон Window1–Window30 (если есть UpperCollision)
-for i = 1, 30 do
-    local windowName = "Window" .. i
-    local window = workspace:FindFirstChild(windowName)
+                if trap then
+                    ESP:AddObjectListener(workspace, {
+                        Name = trapName,
+                        CustomName = "Trap" .. i,
+                        Color = Color3.fromRGB(255, 0, 0),
+                        IsEnabled = "showCollisionESP"
+                    })
+                else
+                    warn("Объект " .. trapName .. " не найден")
+                end
+            end
 
-    if window and window:FindFirstChild("UpperCollision") then
-        ESP:AddObjectListener(window, {
-            Name = "UpperCollision",
-            CustomName = "Window" .. i,
-            Color = Color3.fromRGB(36, 150, 255),
-            IsEnabled = "showCollisionESP"
-        })
-    else
-        warn("Не найден UpperCollision у " .. windowName)
+            _G.TrapESP = ESP
+        end
+
+        -- Включение / отключение ESP
+        if _G.TrapESP then
+            _G.TrapESP:Toggle(Value)
+        end
     end
-end
-
-	end,
-
 })
 
-local Toggle = MiscTab:CreateToggle({
-   Name = "esp - trap",
-   CurrentValue = false,
-   Flag = "toggleexample",
-   Callback = function(Value)
-
-local ESP = loadstring(game:HttpGet("https://Kiriot22.com/releases/ESP.lua"))()
-
-ESP.Players = false
-ESP.Boxes = false
-ESP.Names = true
-ESP:Toggle(true)
-
--- Флаг включения ESP
-ESP.showCollisionESP = true
-
--- Подсветка объектов Trap1–Trap7
-for i = 1, 7 do
-    local trapName = "Trap" .. i
-    local trap = workspace:FindFirstChild(trapName)
-
-    if trap then
-        ESP:AddObjectListener(workspace, {
-            Name = trapName,
-            CustomName = "Trap" .. i,
-            Color = Color3.fromRGB(255, 0, 0), -- красный цвет для ловушек
-            IsEnabled = "showCollisionESP"
-        })
-    else
-        warn("Объект " .. trapName .. " не найден")
-    end
-end
-
-	end,
-
-})
 
 local Toggle = MiscTab:CreateToggle({
    Name = "esp - totem",
@@ -637,41 +912,54 @@ local Toggle = MiscTab:CreateToggle({
 })
 
 local Toggle = MiscTab:CreateToggle({
-   Name = "esp - chest",
-   CurrentValue = false,
-   Flag = "toggleexample",
-   Callback = function(Value)
+    Name = "esp - chest",
+    CurrentValue = false,
+    Flag = "espChestToggle",
+    Callback = function(Value)
+        -- Загружаем ESP один раз
+        if not _G.ChestESP then
+            local success, ESP = pcall(function()
+                return loadstring(game:HttpGet("https://Kiriot22.com/releases/ESP.lua"))()
+            end)
 
-local ESP = loadstring(game:HttpGet("https://Kiriot22.com/releases/ESP.lua"))()
+            if not success or typeof(ESP) ~= "table" then
+                warn("Ошибка загрузки ESP")
+                return
+            end
 
-ESP.Players = false
-ESP.Boxes = false
-ESP.Names = true
-ESP:Toggle(true)
+            ESP.Players = false
+            ESP.Boxes = false
+            ESP.Names = true
+            ESP.showCollisionESP = true
+            ESP:Toggle(true)
 
--- Флаг включения ESP
-ESP.showCollisionESP = true
+            -- Подсветка сундуков Chest1–Chest5
+            for i = 1, 5 do
+                local chestName = "Chest" .. i
+                local chest = workspace:FindFirstChild(chestName)
 
--- Подсветка сундуков Chest1–Chest5
-for i = 1, 5 do
-    local chestName = "Chest" .. i
-    local chest = workspace:FindFirstChild(chestName)
+                if chest then
+                    ESP:AddObjectListener(workspace, {
+                        Name = chestName,
+                        CustomName = "Chest" .. i,
+                        Color = Color3.fromRGB(255, 215, 0), -- золотисто-жёлтый
+                        IsEnabled = "showCollisionESP"
+                    })
+                else
+                    warn("Объект " .. chestName .. " не найден")
+                end
+            end
 
-    if chest then
-        ESP:AddObjectListener(workspace, {
-            Name = chestName,
-            CustomName = "Chest" .. i,
-            Color = Color3.fromRGB(51, 255, 53), -- золотистый цвет
-            IsEnabled = "showCollisionESP"
-        })
-    else
-        warn("Объект " .. chestName .. " не найден")
+            _G.ChestESP = ESP
+        end
+
+        -- Включение / отключение ESP
+        if _G.ChestESP then
+            _G.ChestESP:Toggle(Value)
+        end
     end
-end
-
-	end,
-
 })
+
 			
 local TPTab = Window:CreateTab("defolt", nil) -- Title, Image
 
