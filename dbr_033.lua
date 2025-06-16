@@ -927,6 +927,64 @@ local Button1 = TPTab:CreateButton({
    Name = "fly over the killer (Z)",
    Callback = function()
 
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+
+local localPlayer = Players.LocalPlayer
+local character = localPlayer.Character or localPlayer.CharacterAdded:Wait()
+local hrp = character:WaitForChild("HumanoidRootPart")
+
+local offsetY = 5
+local following = false
+local connection = nil
+local killerCharacter = nil
+
+-- Ищем игрока с командой "Killer"
+local function findKiller()
+	for _, player in pairs(Players:GetPlayers()) do
+		if player ~= localPlayer and player.Team and player.Team.Name == "Killer" then
+			return player.Character
+		end
+	end
+	return nil
+end
+
+-- Включаем зависание
+local function startFollowing()
+	killerCharacter = findKiller()
+	if not killerCharacter or not killerCharacter:FindFirstChild("HumanoidRootPart") then return end
+
+	connection = RunService.RenderStepped:Connect(function()
+		if killerCharacter and killerCharacter:FindFirstChild("HumanoidRootPart") then
+			local targetCFrame = killerCharacter.HumanoidRootPart.CFrame * CFrame.new(0, offsetY, 0)
+			hrp.CFrame = targetCFrame
+		end
+	end)
+end
+
+-- Выключаем зависание
+local function stopFollowing()
+	if connection then
+		connection:Disconnect()
+		connection = nil
+	end
+	killerCharacter = nil
+end
+
+-- Обработка нажатия клавиши Z
+UserInputService.InputBegan:Connect(function(input, gp)
+	if gp then return end
+	if input.KeyCode == Enum.KeyCode.Z then
+		following = not following
+		if following then
+			startFollowing()
+		else
+			stopFollowing()
+		end
+	end
+end)
+
 	end,
 
 })
