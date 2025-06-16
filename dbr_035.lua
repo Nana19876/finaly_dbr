@@ -989,8 +989,8 @@ end)
 
 })
 
-local FOVSlider = TPTab:CreateSlider({
-   Name = "FOV (L+R)",
+local Slider = TPTab:CreateSlider({
+   Name = "FOV",
    Range = {60, 120},
    Increment = 1,
    Suffix = "FOV",
