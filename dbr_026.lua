@@ -792,12 +792,16 @@ end)
 
 })
 
-local Slider1 = TPtab:CreateSlider({
+local Slider = TPTab:CreateSlider({
    Name = "WalkSpeed Slide (A+D)",
    Range = {1, 350},
    Increment = 1,
    Suffix = "Speed",
    CurrentValue = 16,
-
-   	end,
+   Callback = function(Value)
+       local humanoid = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("Humanoid")
+       if humanoid then
+           humanoid.WalkSpeed = Value
+       end
+   end,
 })
