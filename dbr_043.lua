@@ -326,82 +326,113 @@ game:GetService("Workspace").KateOnFire1.HumanoidRootPart.CFrame = workspace.Che
 
 })
    
-local MiscTab = Window:CreateTab("misc", nil) -- Title, Image
-local Section = MiscTab:CreateSection("island")
+local MiscTab  = Window:CreateTab("misc", nil)
+MiscTab:CreateSection("island")
 
 local Toggle = MiscTab:CreateToggle({
-   Name = "esp - player",
-   CurrentValue = false,
-   Flag = "toggleexample",
-   Callback = function(Value)
-   
-   -- Подключение ESP от Kiriot22
-local ESP = loadstring(game:HttpGet("https://Kiriot22.com/releases/ESP.lua"))()
+    Name          = "esp - player",
+    CurrentValue  = false,
+    Flag          = "PlayerESPToggle",
+    Callback      = function(Value)
 
-ESP.Players = true            -- Включаем отображение игроков
-ESP.Boxes = true              -- Показываем коробку
-ESP.Names = true              -- Показываем имя
-ESP.TeamCheck = false         -- Показывать всех, даже тиммейтов
-ESP:Toggle(true)
+        -- Если ESP ещё не создавали – загружаем и настраиваем
+        if not _G.PlayerESP then
+            local ESP = loadstring(game:HttpGet("https://Kiriot22.com/releases/ESP.lua"))()
+            ESP.Players   = true
+            ESP.Boxes     = true
+            ESP.Names     = true
+            ESP.TeamCheck = false
+            ESP:Toggle(true)
 
--- Highlight-подсветка игроков вручную
-local PlayersService = game:GetService("Players")
-local RunService = game:GetService("RunService")
+            ------------------------------------------------------------------
+            -- Highlight-слой (ручная подсветка HumanoidRootPart’ов игроков)
+            ------------------------------------------------------------------
+            local Players     = game:GetService("Players")
+            local RunService  = game:GetService("RunService")
 
--- Шаблон Highlight
-local highlightTemplate = Instance.new("Highlight")
-highlightTemplate.Name = "Highlight"
-highlightTemplate.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+            local hlTemplate  = Instance.new("Highlight")
+            hlTemplate.Name        = "PlayerHighlight"
+            hlTemplate.DepthMode   = Enum.HighlightDepthMode.AlwaysOnTop
 
--- Функция для добавления Highlight
-local function addHighlightToCharacter(character)
-    if character and character:FindFirstChild("HumanoidRootPart") then
-        local hrp = character:FindFirstChild("HumanoidRootPart")
-        if hrp and not hrp:FindFirstChild("Highlight") then
-            local highlightClone = highlightTemplate:Clone()
-            highlightClone.Adornee = character
-            highlightClone.Parent = hrp
+            -- добавляем Highlight к персонажу
+            local function addHighlight(char)
+                if not char then return end
+                local hrp = char:FindFirstChild("HumanoidRootPart")
+                if hrp and not hrp:FindFirstChild("PlayerHighlight") then
+                    local h = hlTemplate:Clone()
+                    h.Adornee = char
+                    h.Parent  = hrp
+                end
+            end
+
+            -- удаляем Highlight
+            local function removeHighlight(char)
+                if not char then return end
+                local hrp = char:FindFirstChild("HumanoidRootPart")
+                if hrp then
+                    local h = hrp:FindFirstChild("PlayerHighlight")
+                    if h then h:Destroy() end
+                end
+            end
+
+            -- подключения, чтобы потом отключить
+            local conns = {}
+
+            -- существующие игроки
+            for _,plr in pairs(Players:GetPlayers()) do
+                if plr.Character then addHighlight(plr.Character) end
+                table.insert(conns,
+                    plr.CharacterAdded:Connect(addHighlight)
+                )
+            end
+
+            -- новые игроки
+            table.insert(conns,
+                Players.PlayerAdded:Connect(function(p)
+                    table.insert(conns,
+                        p.CharacterAdded:Connect(addHighlight)
+                    )
+                end)
+            )
+
+            -- выход игроков
+            table.insert(conns,
+                Players.PlayerRemoving:Connect(function(p)
+                    if p.Character then removeHighlight(p.Character) end
+                end)
+            )
+
+            -- страховочная проверка
+            table.insert(conns,
+                RunService.Heartbeat:Connect(function()
+                    for _,plr in pairs(Players:GetPlayers()) do
+                        if plr.Character then addHighlight(plr.Character) end
+                    end
+                end)
+            )
+
+            ------------------------------------------------------------------
+            -- сохраняем всё в глобальную переменную
+            ------------------------------------------------------------------
+            _G.PlayerESP = {esp = ESP, conns = conns, remover = removeHighlight}
+        end
+
+        ----------------------------------------------------------------------
+        -- Переключение: Value == true  →  включить,  false → выключить
+        ----------------------------------------------------------------------
+        if Value then
+            _G.PlayerESP.esp:Toggle(true)
+        else
+            _G.PlayerESP.esp:Toggle(false)
+            -- убираем все Highlight’ы
+            local Players = game:GetService("Players")
+            for _,plr in pairs(Players:GetPlayers()) do
+                if plr.Character then
+                    _G.PlayerESP.remover(plr.Character)
+                end
+            end
         end
     end
-end
-
--- Добавление Highlight всем текущим игрокам
-for _, player in pairs(PlayersService:GetPlayers()) do
-    player.CharacterAdded:Connect(function(char)
-        addHighlightToCharacter(char)
-    end)
-    if player.Character then
-        addHighlightToCharacter(player.Character)
-    end
-end
-
--- Подключение новых игроков
-PlayersService.PlayerAdded:Connect(function(player)
-    player.CharacterAdded:Connect(function(char)
-        addHighlightToCharacter(char)
-    end)
-end)
-
--- Удаление Highlight при выходе игрока
-PlayersService.PlayerRemoving:Connect(function(player)
-    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-        local hrp = player.Character:FindFirstChild("HumanoidRootPart")
-        local existingHighlight = hrp:FindFirstChild("Highlight")
-        if existingHighlight then
-            existingHighlight:Destroy()
-        end
-    end
-end)
-
--- Подстраховка: периодическая проверка на случай, если Highlight не был добавлен
-RunService.Heartbeat:Connect(function()
-    for _, player in pairs(PlayersService:GetPlayers()) do
-        local character = player.Character
-        if character then
-            addHighlightToCharacter(character)
-        end
-    end
-end)
 
 	end,
 	
