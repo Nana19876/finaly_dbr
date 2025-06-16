@@ -792,13 +792,12 @@ end)
 
 })
 
-local Slider = TPtab:CreateSlider({
+local Slider1 = TPtab:CreateSlider({
    Name = "WalkSpeed Slide (A+D)",
    Range = {1, 350},
    Increment = 1,
    Suffix = "Speed",
    CurrentValue = 16,
 
-   end,
+   	end,
 })
-
