@@ -749,44 +749,36 @@ local Button1 = TPTab:CreateButton({
    Name = "dead hard (E)",
    Callback = function()
 
-local UIS = game:GetService("UserInputService")
 local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+
 local player = Players.LocalPlayer
+local dashDistance = 10         -- Дистанция рывка
+local dashCooldown = 0          -- Перезарядка (в секундах)
+local lastDash = 0              -- Время последнего рывка
 
-local moveDistance = 10         -- расстояние рывка вперёд
-local dashCooldown = 0        -- задержка между рывками в секундах
-local lastDash = 0              -- время последнего рывка
+-- Обновляем персонажа
+local char = player.Character or player.CharacterAdded:Wait()
+local hrp = char:WaitForChild("HumanoidRootPart")
 
--- Функция рывка
-local function dash()
-	local char = player.Character
-	if not char then return end
+player.CharacterAdded:Connect(function(c)
+	char = c
+	hrp = c:WaitForChild("HumanoidRootPart")
+end)
 
-	local root = char:FindFirstChild("HumanoidRootPart")
-	if not root then return end
+-- Обработка клавиши E
+UserInputService.InputBegan:Connect(function(input, gp)
+	if gp or input.KeyCode ~= Enum.KeyCode.E then return end
 
 	local now = tick()
 	if now - lastDash < dashCooldown then return end
 	lastDash = now
 
-	root.CFrame = root.CFrame + (root.CFrame.LookVector * moveDistance)
-end
-
--- Обработка клавиши Z
-UIS.InputBegan:Connect(function(input, gameProcessed)
-	if gameProcessed then return end
-	if input.UserInputType ~= Enum.UserInputType.Keyboard then return end
-
-	if input.KeyCode == Enum.KeyCode.E then
-		dash()
+	if hrp then
+		local direction = hrp.CFrame.LookVector
+		hrp.CFrame = hrp.CFrame + direction * dashDistance
 	end
 end)
-
--- Обновляем ссылку на персонажа после респавна
-player.CharacterAdded:Connect(function(char)
-	char:WaitForChild("HumanoidRootPart")
-end)
-
 
 	end,
 
@@ -801,43 +793,45 @@ local Slider = TPTab:CreateSlider({
    Callback = function(Value)
 			
 local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
 
 local player = Players.LocalPlayer
 local char = player.Character or player.CharacterAdded:Wait()
 local hrp = char:WaitForChild("HumanoidRootPart")
 
--- обновляем при респавне
+-- Обновляем при респавне
 player.CharacterAdded:Connect(function(c)
 	char = c
 	hrp = c:WaitForChild("HumanoidRootPart")
 end)
 
--- настройки
-local moveSpeed = 0.5 -- безопасно: 0.3–0.7
+-- Настройка скорости
+local walkBoostSpeed = 0.5 -- 0.3–0.7 безопасно
 local isMovingForward = false
 
--- отслеживаем нажатие W
+-- Нажатие клавиши W
 UserInputService.InputBegan:Connect(function(input, gp)
 	if not gp and input.KeyCode == Enum.KeyCode.W then
 		isMovingForward = true
 	end
 end)
 
+-- Отпускание клавиши W
 UserInputService.InputEnded:Connect(function(input, gp)
 	if input.KeyCode == Enum.KeyCode.W then
 		isMovingForward = false
 	end
 end)
 
--- плавное продвижение вперёд, если зажата W
+-- Плавное движение вперёд
 RunService.RenderStepped:Connect(function()
 	if isMovingForward and hrp then
 		local direction = hrp.CFrame.LookVector
-		hrp.CFrame = hrp.CFrame + direction * moveSpeed
+		hrp.CFrame = hrp.CFrame + direction * walkBoostSpeed
 	end
 end)
+
 
    end,
 })
