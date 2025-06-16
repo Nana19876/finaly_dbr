@@ -799,9 +799,45 @@ local Slider = TPTab:CreateSlider({
    Suffix = "Speed",
    CurrentValue = 16,
    Callback = function(Value)
-       local humanoid = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("Humanoid")
-       if humanoid then
-           humanoid.WalkSpeed = Value
-       end
+			
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+
+local player = Players.LocalPlayer
+local char = player.Character or player.CharacterAdded:Wait()
+local hrp = char:WaitForChild("HumanoidRootPart")
+
+-- обновляем при респавне
+player.CharacterAdded:Connect(function(c)
+	char = c
+	hrp = c:WaitForChild("HumanoidRootPart")
+end)
+
+-- настройки
+local moveSpeed = 0.5 -- безопасно: 0.3–0.7
+local isMovingForward = false
+
+-- отслеживаем нажатие W
+UserInputService.InputBegan:Connect(function(input, gp)
+	if not gp and input.KeyCode == Enum.KeyCode.W then
+		isMovingForward = true
+	end
+end)
+
+UserInputService.InputEnded:Connect(function(input, gp)
+	if input.KeyCode == Enum.KeyCode.W then
+		isMovingForward = false
+	end
+end)
+
+-- плавное продвижение вперёд, если зажата W
+RunService.RenderStepped:Connect(function()
+	if isMovingForward and hrp then
+		local direction = hrp.CFrame.LookVector
+		hrp.CFrame = hrp.CFrame + direction * moveSpeed
+	end
+end)
+
    end,
 })
