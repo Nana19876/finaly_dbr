@@ -1046,9 +1046,6 @@ userInput.InputBegan:Connect(function(input, gameProcessed)
     end
 end)
 
-
-local Section = TPTab:CreateSection("for functions to work, click on them once, then just click on the letter next to the function")
-
 -- Dead Hard с переключателем
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
