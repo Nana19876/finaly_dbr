@@ -1047,14 +1047,9 @@ userInput.InputBegan:Connect(function(input, gameProcessed)
 end)
 
 
--- !!! НЕ создаём вкладку повторно, если она уже есть
--- Предположим, она была создана ранее:
--- local TPTab = Window:CreateTab("defolt", nil)
-
--- Просто добавим секцию (если ещё не добавлена)
 local Section = TPTab:CreateSection("for functions to work, click on them once, then just click on the letter next to the function")
 
--- Dead Hard с переключением
+-- Dead Hard с переключателем
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 
@@ -1074,11 +1069,13 @@ player.CharacterAdded:Connect(function(c)
 	hrp = c:WaitForChild("HumanoidRootPart")
 end)
 
--- Кнопка, включающая/выключающая Dead Hard по E
-local Button1 = TPTab:CreateButton({
+-- Переключатель
+local DeadHardToggle = TPTab:CreateToggle({
 	Name = "Dead Hard (E)",
-	Callback = function()
-		dashEnabled = not dashEnabled
+	CurrentValue = false,
+	Flag = "deadHardToggle",
+	Callback = function(Value)
+		dashEnabled = Value
 
 		if dashEnabled then
 			dashConnection = UserInputService.InputBegan:Connect(function(input, gp)
@@ -1105,16 +1102,6 @@ local Button1 = TPTab:CreateButton({
 	end,
 })
 
--- Toggle для GUI
-local toggleDash
-toggleDash = TPTab:CreateToggle({
-	Name = "Dead Hard (E)",
-	CurrentValue = false,
-	Flag = "deadHardToggle",
-	Callback = function(Value)
-		dashEnabled = Value
-	end
-})
 
 local Slider = TPTab:CreateSlider({
    Name = "WalkSpeed Slide (A+D)",
