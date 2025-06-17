@@ -738,18 +738,18 @@ MiscTab:CreateToggle({
     end
 })
 
--- Цвет и список объектов для pallet ESP
+-- Цвет и список ESP-объектов для паллет
 local palletColor = Color3.fromRGB(85, 110, 247)
 local palletESPObjects = {}
 
--- ColorPicker для паллет
+-- ColorPicker для цвета паллет
 MiscTab:CreateColorPicker({
     Name = "Цвет паллет (ESP)",
     Color = palletColor,
     Flag = "PalletESPColor",
     Callback = function(Value)
         palletColor = Value
-        -- Обновить цвет у всех активных паллет ESP
+        -- обновляем цвет всех активных ESP-объектов
         for _, obj in pairs(palletESPObjects) do
             if obj and typeof(obj) == "table" then
                 obj.Color = palletColor
@@ -758,51 +758,60 @@ MiscTab:CreateColorPicker({
     end
 })
 
--- Toggle ESP для паллет
+-- Toggle ESP-подсветки паллет
 MiscTab:CreateToggle({
     Name = "esp - pallet",
     CurrentValue = false,
     Flag = "espPalletToggle",
     Callback = function(Value)
         if Value then
-            -- Загружаем ESP, если ещё не был загружен
+            -- Инициализация ESP (если ещё нет)
             if not _G.PalletESP then
                 local ESP = loadstring(game:HttpGet("https://Kiriot22.com/releases/ESP.lua"))()
-
                 ESP.Players = false
                 ESP.Boxes = false
                 ESP.Names = true
-                ESP.showCollisionESP = true
                 ESP:Toggle(true)
-
                 _G.PalletESP = ESP
+            else
+                _G.PalletESP:Toggle(true)
             end
 
             local ESP = _G.PalletESP
 
-            -- Очистка старых объектов
+            -- Удаляем старые из ESP.Objects (иначе не будут работать повторно)
+            if ESP.Objects then
+                for i = #ESP.Objects, 1, -1 do
+                    local obj = ESP.Objects[i]
+                    if obj and obj.Name and string.match(obj.Name, "^Pallet%d+$") then
+                        table.remove(ESP.Objects, i)
+                    end
+                end
+            end
+
+            -- Очищаем предыдущие локальные трекеры
             table.clear(palletESPObjects)
 
-            -- Добавление паллет
+            -- Добавляем паллеты Pallet1–Pallet30
             for i = 1, 30 do
                 local pallet = workspace:FindFirstChild("Pallet" .. i)
                 local panel = pallet and pallet:FindFirstChild("Panel")
+                local part = panel and panel:FindFirstChild("ModelCollision")
 
-                if panel and panel:FindFirstChild("ModelCollision") then
-                    local espObj = ESP:Add(panel.ModelCollision, {
-                        Name = "ModelCollision",
-                        CustomName = "Pallet" .. i,
+                if part then
+                    local espObj = ESP:Add(part, {
+                        Name = "Pallet" .. i,
                         Color = palletColor,
-                        PrimaryPart = panel.ModelCollision
+                        PrimaryPart = part
                     })
                     table.insert(palletESPObjects, espObj)
                 else
-                    warn("Не найдена панель или ModelCollision у Pallet" .. i)
+                    warn("Не найдена ModelCollision у Pallet" .. i)
                 end
             end
 
         else
-            -- Отключаем ESP
+            -- Выключаем ESP и очищаем объекты
             if _G.PalletESP then
                 _G.PalletESP:Toggle(false)
             end
@@ -817,6 +826,7 @@ MiscTab:CreateToggle({
         end
     end
 })
+
 
 ------------------------------------------------------------
 -- 1. ColorPicker: выбираем цвет обводки люка (Hatch)     --
