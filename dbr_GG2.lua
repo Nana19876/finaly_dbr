@@ -1405,3 +1405,16 @@ AnimationTab:CreateButton({
    end,
 })
 
+AnimationTab:CreateButton({
+    Name = "Stop All Animations",
+    Callback = function()
+        local Players = game:GetService("Players")
+        local player = Players.LocalPlayer
+        local character = player.Character or player.CharacterAdded:Wait()
+        local humanoid = character:WaitForChild("Humanoid")
+
+        for _, track in ipairs(humanoid:GetPlayingAnimationTracks()) do
+            track:Stop()
+        end
+    end,
+})
