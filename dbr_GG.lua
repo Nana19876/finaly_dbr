@@ -1458,23 +1458,6 @@ AnimationTab:CreateButton({
 
 -- Кнопка: SearchChest
 AnimationTab:CreateButton({
-   Name = "animation (greeting)",
-   Callback = function()
-       local Players = game:GetService("Players")
-       local player = Players.LocalPlayer
-       local character = player.Character or player.CharacterAdded:Wait()
-       local humanoid = character:WaitForChild("Humanoid")
-
-       local anim = Instance.new("Animation")
-       anim.AnimationId = "rbxassetid://94996092165026"
-
-       local animTrack = humanoid:LoadAnimation(anim)
-       animTrack:Play()
-   end,
-})
-
--- Кнопка: SearchChest
-AnimationTab:CreateButton({
    Name = "animation (medkit)",
    Callback = function()
        local Players = game:GetService("Players")
@@ -1501,23 +1484,6 @@ AnimationTab:CreateButton({
 
        local anim = Instance.new("Animation")
        anim.AnimationId = "rbxassetid://131682837184136"
-
-       local animTrack = humanoid:LoadAnimation(anim)
-       animTrack:Play()
-   end,
-})
-
--- Кнопка: SearchChest
-AnimationTab:CreateButton({
-   Name = "animation (Craft_shard)",
-   Callback = function()
-       local Players = game:GetService("Players")
-       local player = Players.LocalPlayer
-       local character = player.Character or player.CharacterAdded:Wait()
-       local humanoid = character:WaitForChild("Humanoid")
-
-       local anim = Instance.new("Animation")
-       anim.AnimationId = "rbxassetid://14534530685"
 
        local animTrack = humanoid:LoadAnimation(anim)
        animTrack:Play()
