@@ -654,21 +654,42 @@ end)
 	
 })
 
+local selectedColor = Color3.fromRGB(0, 255, 255)
+
+-- Цветовой выбор
+MiscTab:CreateColorPicker({
+    Name = "Цвет генераторов (ESP)",
+    Color = selectedColor,
+    Flag = "GeneratorESPColor",
+    Callback = function(Value)
+        selectedColor = Value
+    end
+})
+
+-- Тоггл ESP генераторов
 local Toggle = MiscTab:CreateToggle({
    Name = "esp - generator",
    CurrentValue = false,
    Flag = "espGeneratorToggle",
    Callback = function(Value)
 
-     
       if not _G.GeneratorESP then
-         _G.GeneratorESP = loadstring(game:HttpGet("https://Kiriot22.com/releases/ESP.lua"))()
-         _G.GeneratorESP.Players = false
-         _G.GeneratorESP.Boxes = false
-         _G.GeneratorESP.Names = true
-         _G.GeneratorESP.showGeneratorESP = true
+         local success, esp = pcall(function()
+            return loadstring(game:HttpGet("https://Kiriot22.com/releases/ESP.lua"))()
+         end)
 
-         
+         if not success then
+            warn("Не удалось загрузить ESP")
+            return
+         end
+
+         _G.GeneratorESP = esp
+         esp.Players = false
+         esp.Boxes = false
+         esp.Names = true
+         esp.showGeneratorESP = true
+
+         -- Добавляем генераторы
          for i = 1, 7 do
             local generatorName = "Generator" .. i
             local generator = workspace:FindFirstChild(generatorName)
@@ -676,8 +697,8 @@ local Toggle = MiscTab:CreateToggle({
             if generator and generator:FindFirstChild("CollisionBox") then
                _G.GeneratorESP:AddObjectListener(generator, {
                   Name = "CollisionBox",
-                  CustomName = "Generator" .. i,
-                  Color = Color3.fromRGB(0, 255, 255),
+                  CustomName = generatorName,
+                  Color = selectedColor, -- 💡 применяем выбранный цвет
                   IsEnabled = "showGeneratorESP"
                })
             else
@@ -686,14 +707,13 @@ local Toggle = MiscTab:CreateToggle({
          end
       end
 
-      
-      if Value then
-         _G.GeneratorESP:Toggle(true)
-      else
-         _G.GeneratorESP:Toggle(false)
+      -- Включение / отключение ESP
+      if _G.GeneratorESP then
+         _G.GeneratorESP:Toggle(Value)
       end
    end
 })
+
 
 
 local Toggle = MiscTab:CreateToggle({
