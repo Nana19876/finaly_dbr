@@ -1055,10 +1055,12 @@ local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 
 local player = Players.LocalPlayer
-local dashDistance = 10         -- Дистанция рывка
-local dashCooldown = 0          -- Перезарядка (в секундах)
-local lastDash = 0              -- Время последнего рывка
+local dashDistance = 10
+local dashCooldown = 0
+local lastDash = 0
 
+local dashEnabled = false
+local dashConnection = nil
 
 local char = player.Character or player.CharacterAdded:Wait()
 local hrp = char:WaitForChild("HumanoidRootPart")
@@ -1068,22 +1070,34 @@ player.CharacterAdded:Connect(function(c)
 	hrp = c:WaitForChild("HumanoidRootPart")
 end)
 
+local Button1 = TPTab:CreateButton({
+	Name = "Dead Hard (E)",
+	Callback = function()
+		dashEnabled = not dashEnabled
 
-UserInputService.InputBegan:Connect(function(input, gp)
-	if gp or input.KeyCode ~= Enum.KeyCode.E then return end
+		if dashEnabled then
+			dashConnection = UserInputService.InputBegan:Connect(function(input, gp)
+				if gp or input.KeyCode ~= Enum.KeyCode.E then return end
 
-	local now = tick()
-	if now - lastDash < dashCooldown then return end
-	lastDash = now
+				local now = tick()
+				if now - lastDash < dashCooldown then return end
+				lastDash = now
 
-	if hrp then
-		local direction = hrp.CFrame.LookVector
-		hrp.CFrame = hrp.CFrame + direction * dashDistance
-	end
-end)
+				if hrp then
+					local direction = hrp.CFrame.LookVector
+					hrp.CFrame = hrp.CFrame + direction * dashDistance
+				end
+			end)
 
+			warn("Dead Hard включён")
+		else
+			if dashConnection then
+				dashConnection:Disconnect()
+				dashConnection = nil
+			end
+			warn("Dead Hard выключен")
+		end
 	end,
-
 })
 
 local Slider = TPTab:CreateSlider({
