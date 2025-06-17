@@ -1405,6 +1405,23 @@ AnimationTab:CreateButton({
    end,
 })
 
+-- Кнопка: SearchChest
+AnimationTab:CreateButton({
+   Name = "animation (guns)",
+   Callback = function()
+       local Players = game:GetService("Players")
+       local player = Players.LocalPlayer
+       local character = player.Character or player.CharacterAdded:Wait()
+       local humanoid = character:WaitForChild("Humanoid")
+
+       local anim = Instance.new("Animation")
+       anim.AnimationId = "rbxassetid://15081495855"
+
+       local animTrack = humanoid:LoadAnimation(anim)
+       animTrack:Play()
+   end,
+})
+
 AnimationTab:CreateButton({
     Name = "Stop All Animations",
     Callback = function()
