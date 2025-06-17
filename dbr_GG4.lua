@@ -909,7 +909,6 @@ MiscTab:CreateColorPicker({
     Flag = "WindowESPColor",
     Callback = function(Value)
         windowColor = Value
-        -- Обновляем цвет у уже подсвеченных окон
         for _, obj in pairs(windowESPObjects) do
             if obj and typeof(obj) == "table" then
                 obj.Color = windowColor
@@ -918,14 +917,14 @@ MiscTab:CreateColorPicker({
     end
 })
 
--- Toggle ESP для окон
+-- Toggle для окон
 MiscTab:CreateToggle({
     Name = "esp - window",
     CurrentValue = false,
     Flag = "espWindowToggle",
     Callback = function(Value)
         if Value then
-            -- Загружаем ESP, если нужно
+            -- Загружаем ESP при первом запуске
             if not _G.WindowESP then
                 local ESP = loadstring(game:HttpGet("https://Kiriot22.com/releases/ESP.lua"))()
                 ESP.Players = false
@@ -938,7 +937,7 @@ MiscTab:CreateToggle({
             local ESP = _G.WindowESP
             table.clear(windowESPObjects)
 
-            -- Добавляем окна с UpperCollision
+            -- Добавляем окна Window1–Window30
             for i = 1, 30 do
                 local window = workspace:FindFirstChild("Window" .. i)
                 local part = window and window:FindFirstChild("UpperCollision")
@@ -956,14 +955,25 @@ MiscTab:CreateToggle({
             end
 
         else
-            -- Выключаем ESP и скрываем все окна
+            -- Отключаем ESP
             if _G.WindowESP then
                 _G.WindowESP:Toggle(false)
             end
 
+            -- Отключаем текущие объекты
             for _, obj in pairs(windowESPObjects) do
                 if obj and typeof(obj) == "table" then
                     obj.Enabled = false
+                end
+            end
+
+            -- Удаляем из внутреннего списка ESP (fix для повторного добавления)
+            if _G.WindowESP and _G.WindowESP.Objects then
+                for i = #_G.WindowESP.Objects, 1, -1 do
+                    local obj = _G.WindowESP.Objects[i]
+                    if obj and obj.Name and string.match(obj.Name, "^Window%d+$") then
+                        table.remove(_G.WindowESP.Objects, i)
+                    end
                 end
             end
 
@@ -971,6 +981,7 @@ MiscTab:CreateToggle({
         end
     end
 })
+
 
 -- Цвет и список объектов для ловушек
 local trapColor = Color3.fromRGB(255, 0, 0)
