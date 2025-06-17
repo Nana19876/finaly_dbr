@@ -654,7 +654,9 @@ end)
 	
 })
 
+-- Хранилище цвета и добавленных объектов
 local selectedColor = Color3.fromRGB(0, 255, 255)
+local generatorESPObjects = {}
 
 -- Цветовой выбор
 MiscTab:CreateColorPicker({
@@ -663,58 +665,78 @@ MiscTab:CreateColorPicker({
     Flag = "GeneratorESPColor",
     Callback = function(Value)
         selectedColor = Value
+        -- Обновить цвет у уже активных ESP-объектов
+        for _, espObj in pairs(generatorESPObjects) do
+            if espObj and typeof(espObj) == "table" then
+                espObj.Color = selectedColor
+            end
+        end
     end
 })
 
--- Тоггл ESP генераторов
-local Toggle = MiscTab:CreateToggle({
-   Name = "esp - generator",
-   CurrentValue = false,
-   Flag = "espGeneratorToggle",
-   Callback = function(Value)
+-- Тоггл подсветки генераторов
+MiscTab:CreateToggle({
+    Name = "esp - generator",
+    CurrentValue = false,
+    Flag = "espGeneratorToggle",
+    Callback = function(Value)
+        if Value then
+            -- Загрузка ESP, если ещё не загружен
+            if not _G.GeneratorESP then
+                local success, esp = pcall(function()
+                    return loadstring(game:HttpGet("https://Kiriot22.com/releases/ESP.lua"))()
+                end)
 
-      if not _G.GeneratorESP then
-         local success, esp = pcall(function()
-            return loadstring(game:HttpGet("https://Kiriot22.com/releases/ESP.lua"))()
-         end)
+                if not success then
+                    warn("Не удалось загрузить ESP")
+                    return
+                end
 
-         if not success then
-            warn("Не удалось загрузить ESP")
-            return
-         end
-
-         _G.GeneratorESP = esp
-         esp.Players = false
-         esp.Boxes = false
-         esp.Names = true
-         esp.showGeneratorESP = true
-
-         -- Добавляем генераторы
-         for i = 1, 7 do
-            local generatorName = "Generator" .. i
-            local generator = workspace:FindFirstChild(generatorName)
-
-            if generator and generator:FindFirstChild("CollisionBox") then
-               _G.GeneratorESP:AddObjectListener(generator, {
-                  Name = "CollisionBox",
-                  CustomName = generatorName,
-                  Color = selectedColor, -- 💡 применяем выбранный цвет
-                  IsEnabled = "showGeneratorESP"
-               })
-            else
-               warn("Не найден CollisionBox у " .. generatorName)
+                _G.GeneratorESP = esp
+                esp.Players = false
+                esp.Boxes = false
+                esp.Names = true
+                esp:Toggle(true)
             end
-         end
-      end
 
-      -- Включение / отключение ESP
-      if _G.GeneratorESP then
-         _G.GeneratorESP:Toggle(Value)
-      end
-   end
+            local esp = _G.GeneratorESP
+
+            -- Очистка предыдущих объектов
+            table.clear(generatorESPObjects)
+
+            -- Добавление генераторов
+            for i = 1, 7 do
+                local generator = workspace:FindFirstChild("Generator" .. i)
+                local part = generator and generator:FindFirstChild("CollisionBox")
+
+                if part then
+                    local espObj = esp:Add(part, {
+                        Name = "Generator" .. i,
+                        Color = selectedColor,
+                        PrimaryPart = part
+                    })
+                    table.insert(generatorESPObjects, espObj)
+                else
+                    warn("Не найден CollisionBox у Generator" .. i)
+                end
+            end
+
+        else
+            -- Отключаем ESP и скрываем объекты
+            if _G.GeneratorESP then
+                _G.GeneratorESP:Toggle(false)
+            end
+
+            for _, obj in pairs(generatorESPObjects) do
+                if obj and typeof(obj) == "table" then
+                    obj.Enabled = false
+                end
+            end
+
+            table.clear(generatorESPObjects)
+        end
+    end
 })
-
-
 
 local Toggle = MiscTab:CreateToggle({
     Name = "esp - pallet",
