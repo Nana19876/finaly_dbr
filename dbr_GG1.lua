@@ -965,83 +965,81 @@ local Toggle = MiscTab:CreateToggle({
 local TPTab = Window:CreateTab("defolt", nil)
 local Section = TPTab:CreateSection("for functions to work, click on them once, then just click on the letter next to the function")
 
-local Button1 = TPTab:CreateButton({
-   Name = "noclip (V)",
-   Callback = function()
+local noclipConnection
+local noclipRunning = false
 
-local player = game.Players.LocalPlayer
-local userInput = game:GetService("UserInputService")
-local rs = game:GetService("RunService")
-local c = workspace.CurrentCamera
+local Toggle = TPTab:CreateToggle({
+    Name = "noclip",
+    CurrentValue = false,
+    Flag = "noclipToggle",
+    Callback = function(Value)
+        local player = game.Players.LocalPlayer
+        local userInput = game:GetService("UserInputService")
+        local rs = game:GetService("RunService")
+        local camera = workspace.CurrentCamera
 
-local speed = 60
-local selected = false
-local lastUpdate = 0
+        local speed = 60
+        local lastUpdate = tick()
 
--- Function to handle player movement
-local function getNextMovement(deltaTime)
-    local nextMove = Vector3.new()
+        local function getNextMovement(deltaTime)
+            local nextMove = Vector3.new()
+            local cameraCFrame = camera.CFrame
+            local forward = cameraCFrame.LookVector
+            local right = cameraCFrame.RightVector
 
-    -- Get the camera's forward and right directions
-    local cameraCFrame = c.CFrame
-    local cameraForward = cameraCFrame.LookVector
-    local cameraRight = cameraCFrame.RightVector
-
-    -- Calculate movement direction based on the camera orientation
-    if userInput:IsKeyDown("W") then
-        nextMove = nextMove + cameraForward
-    elseif userInput:IsKeyDown("S") then
-        nextMove = nextMove - cameraForward
-    end
-
-    if userInput:IsKeyDown("A") then
-        nextMove = nextMove - cameraRight
-    elseif userInput:IsKeyDown("D") then
-        nextMove = nextMove + cameraRight
-    end
-
-    return nextMove * (speed * deltaTime)
-end
-
--- Function to toggle noclip mode
-local function toggleNoClip()
-    local char = player.Character
-    if char then
-        local humanoid = char:WaitForChild("Humanoid")
-        local root = char:WaitForChild("HumanoidRootPart")
-
-        selected = not selected
-
-        if selected then
-            -- Enable noclip: Disable gravity, disable collisions
-            humanoid.PlatformStand = true
-            root.Anchored = true
-
-            while selected do
-                wait()
-                local delta = tick() - lastUpdate
-                local move = getNextMovement(delta)
-                -- Move the character through objects
-                local pos = root.Position
-                root.CFrame = CFrame.new(pos + move)
-                lastUpdate = tick()
+            if userInput:IsKeyDown(Enum.KeyCode.W) then
+                nextMove += forward
+            elseif userInput:IsKeyDown(Enum.KeyCode.S) then
+                nextMove -= forward
             end
 
-            humanoid.PlatformStand = false
-            root.Anchored = false
+            if userInput:IsKeyDown(Enum.KeyCode.A) then
+                nextMove -= right
+            elseif userInput:IsKeyDown(Enum.KeyCode.D) then
+                nextMove += right
+            end
+
+            return nextMove * (speed * deltaTime)
+        end
+
+        -- Включение noclip
+        if Value and not noclipRunning then
+            noclipRunning = true
+            local char = player.Character
+            if char then
+                local humanoid = char:WaitForChild("Humanoid")
+                local root = char:WaitForChild("HumanoidRootPart")
+
+                humanoid.PlatformStand = true
+                root.Anchored = true
+
+                noclipConnection = rs.RenderStepped:Connect(function()
+                    local delta = tick() - lastUpdate
+                    local move = getNextMovement(delta)
+                    root.CFrame = root.CFrame + move
+                    lastUpdate = tick()
+                end)
+            end
+        end
+
+        -- Выключение noclip
+        if not Value and noclipRunning then
+            noclipRunning = false
+            if noclipConnection then
+                noclipConnection:Disconnect()
+                noclipConnection = nil
+            end
+
+            local char = player.Character
+            if char then
+                local humanoid = char:FindFirstChild("Humanoid")
+                local root = char:FindFirstChild("HumanoidRootPart")
+
+                if humanoid then humanoid.PlatformStand = false end
+                if root then root.Anchored = false end
+            end
         end
     end
-end
-
--- Detect V key to toggle noclip
-userInput.InputBegan:Connect(function(input, gameProcessed)
-    if gameProcessed then return end
-    if input.KeyCode == Enum.KeyCode.V then
-        toggleNoClip()
-    end
-end)
-			
-   end,
 })
 
 local Button1 = TPTab:CreateButton({
