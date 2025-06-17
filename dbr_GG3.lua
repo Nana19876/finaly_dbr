@@ -738,271 +738,466 @@ MiscTab:CreateToggle({
     end
 })
 
-local Toggle = MiscTab:CreateToggle({
+-- Цвет и список объектов для pallet ESP
+local palletColor = Color3.fromRGB(85, 110, 247)
+local palletESPObjects = {}
+
+-- ColorPicker для паллет
+MiscTab:CreateColorPicker({
+    Name = "Цвет паллет (ESP)",
+    Color = palletColor,
+    Flag = "PalletESPColor",
+    Callback = function(Value)
+        palletColor = Value
+        -- Обновить цвет у всех активных паллет ESP
+        for _, obj in pairs(palletESPObjects) do
+            if obj and typeof(obj) == "table" then
+                obj.Color = palletColor
+            end
+        end
+    end
+})
+
+-- Toggle ESP для паллет
+MiscTab:CreateToggle({
     Name = "esp - pallet",
     CurrentValue = false,
     Flag = "espPalletToggle",
     Callback = function(Value)
+        if Value then
+            -- Загружаем ESP, если ещё не был загружен
+            if not _G.PalletESP then
+                local ESP = loadstring(game:HttpGet("https://Kiriot22.com/releases/ESP.lua"))()
 
-        
-        if not _G.PalletESP then
-            local ESP = loadstring(game:HttpGet("https://Kiriot22.com/releases/ESP.lua"))()
+                ESP.Players = false
+                ESP.Boxes = false
+                ESP.Names = true
+                ESP.showCollisionESP = true
+                ESP:Toggle(true)
 
-            ESP.Players = false
-            ESP.Boxes = false
-            ESP.Names = true
-            ESP.showCollisionESP = true
-            ESP:Toggle(true)
+                _G.PalletESP = ESP
+            end
 
-            
+            local ESP = _G.PalletESP
+
+            -- Очистка старых объектов
+            table.clear(palletESPObjects)
+
+            -- Добавление паллет
             for i = 1, 30 do
-                local palletName = "Pallet" .. i
-                local pallet = workspace:FindFirstChild(palletName)
+                local pallet = workspace:FindFirstChild("Pallet" .. i)
+                local panel = pallet and pallet:FindFirstChild("Panel")
 
-                if pallet and pallet:FindFirstChild("Panel") then
-                    ESP:AddObjectListener(pallet.Panel, {
+                if panel and panel:FindFirstChild("ModelCollision") then
+                    local espObj = ESP:Add(panel.ModelCollision, {
                         Name = "ModelCollision",
                         CustomName = "Pallet" .. i,
-                        Color = Color3.fromRGB(85, 110, 247),
-                        IsEnabled = "showCollisionESP"
+                        Color = palletColor,
+                        PrimaryPart = panel.ModelCollision
                     })
+                    table.insert(palletESPObjects, espObj)
                 else
-                    warn("Не найдена панель у " .. palletName)
+                    warn("Не найдена панель или ModelCollision у Pallet" .. i)
                 end
             end
 
-            _G.PalletESP = ESP
-        end
-
-        
-        if Value then
-            _G.PalletESP:Toggle(true)
         else
-            _G.PalletESP:Toggle(false)
+            -- Отключаем ESP
+            if _G.PalletESP then
+                _G.PalletESP:Toggle(false)
+            end
+
+            for _, obj in pairs(palletESPObjects) do
+                if obj and typeof(obj) == "table" then
+                    obj.Enabled = false
+                end
+            end
+
+            table.clear(palletESPObjects)
         end
     end
 })
 
+------------------------------------------------------------
+-- 1. ColorPicker: выбираем цвет обводки люка (Hatch)     --
+------------------------------------------------------------
+local hatchColor       = Color3.fromRGB(0, 255, 0)   -- цвет по умолчанию
+local hatchESPObjects  = {}                          -- таблица для трекеров ESP
 
-local Toggle = MiscTab:CreateToggle({
-    Name = "esp - hatch",
-    CurrentValue = false,
-    Flag = "espHatchToggle",
+MiscTab:CreateColorPicker({
+    Name     = "Цвет люка (ESP)",
+    Color    = hatchColor,
+    Flag     = "HatchESPColor",
     Callback = function(Value)
+        hatchColor = Value
+        -- обновляем цвет у уже подсвеченных Rim-ов
+        for _, obj in pairs(hatchESPObjects) do
+            if obj and typeof(obj) == "table" then
+                obj.Color = hatchColor
+            end
+        end
+    end
+})
 
-        
-        if not _G.HatchESP then
-            local ESP = loadstring(game:HttpGet("https://Kiriot22.com/releases/ESP.lua"))()
+------------------------------------------------------------
+-- 2. Toggle: включает / выключает подсветку Hatch.Visual --
+------------------------------------------------------------
+MiscTab:CreateToggle({
+    Name          = "esp - hatch",
+    CurrentValue  = false,
+    Flag          = "espHatchToggle",
+    Callback      = function(Value)
+        if Value then
+            ------------------------------------------------
+            -- Включение ESP
+            ------------------------------------------------
+            -- Загружаем ESP-библиотеку, если ещё не загружена
+            if not _G.HatchESP then
+                local ESP = loadstring(game:HttpGet("https://Kiriot22.com/releases/ESP.lua"))()
+                ESP.Players = false
+                ESP.Boxes   = false
+                ESP.Names   = true
+                ESP:Toggle(true)
+                _G.HatchESP = ESP
+            end
 
-            ESP.Players = false
-            ESP.Boxes = false
-            ESP.Names = true
-            ESP.showCollisionESP = true
-            ESP:Toggle(true)
+            local ESP = _G.HatchESP
+            table.clear(hatchESPObjects)   -- очищаем старые объекты
 
-            -- Подсветка Hatch.Visual.Rim
+            -- Ищем люк и его Rim
             local hatch = workspace:FindFirstChild("Hatch")
-            if hatch and hatch:FindFirstChild("Visual") and hatch.Visual:FindFirstChild("Rim") then
-                ESP:AddObjectListener(hatch.Visual, {
-                    Name = "Rim",
-                    CustomName = "Hatch",
-                    Color = Color3.fromRGB(0, 255, 0),
-                    IsEnabled = "showCollisionESP"
+            local rim   = hatch and hatch:FindFirstChild("Visual") and hatch.Visual:FindFirstChild("Rim")
+
+            if rim then
+                -- Добавляем Rim в ESP и запоминаем объект
+                local espObj = ESP:Add(rim, {
+                    Name        = "Hatch",
+                    Color       = hatchColor,
+                    PrimaryPart = rim
                 })
+                table.insert(hatchESPObjects, espObj)
             else
                 warn("Объект Hatch.Visual.Rim не найден")
             end
 
-            _G.HatchESP = ESP
-        end
+        else
+            ------------------------------------------------
+            -- Выключение ESP
+            ------------------------------------------------
+            if _G.HatchESP then
+                _G.HatchESP:Toggle(false)
+            end
 
-        
-        if _G.HatchESP then
-            _G.HatchESP:Toggle(Value)
+            for _, obj in pairs(hatchESPObjects) do
+                if obj and typeof(obj) == "table" then
+                    obj.Enabled = false       -- скрываем Rim-ы
+                end
+            end
+            table.clear(hatchESPObjects)
         end
     end
 })
 
-local Toggle = MiscTab:CreateToggle({
+-- Цвет и список объектов для окон
+local windowColor = Color3.fromRGB(36, 150, 255)
+local windowESPObjects = {}
+
+-- ColorPicker для окон
+MiscTab:CreateColorPicker({
+    Name = "Цвет окон (ESP)",
+    Color = windowColor,
+    Flag = "WindowESPColor",
+    Callback = function(Value)
+        windowColor = Value
+        -- Обновляем цвет у уже подсвеченных окон
+        for _, obj in pairs(windowESPObjects) do
+            if obj and typeof(obj) == "table" then
+                obj.Color = windowColor
+            end
+        end
+    end
+})
+
+-- Toggle ESP для окон
+MiscTab:CreateToggle({
     Name = "esp - window",
     CurrentValue = false,
     Flag = "espWindowToggle",
     Callback = function(Value)
+        if Value then
+            -- Загружаем ESP, если нужно
+            if not _G.WindowESP then
+                local ESP = loadstring(game:HttpGet("https://Kiriot22.com/releases/ESP.lua"))()
+                ESP.Players = false
+                ESP.Boxes = false
+                ESP.Names = true
+                ESP:Toggle(true)
+                _G.WindowESP = ESP
+            end
 
-        
-        if not _G.WindowESP then
-            local ESP = loadstring(game:HttpGet("https://Kiriot22.com/releases/ESP.lua"))()
+            local ESP = _G.WindowESP
+            table.clear(windowESPObjects)
 
-            ESP.Players = false
-            ESP.Boxes = false
-            ESP.Names = true
-            ESP.showCollisionESP = true
-            ESP:Toggle(true)
-
-            -- Подсветка окон Window1–Window30 (если есть UpperCollision)
+            -- Добавляем окна с UpperCollision
             for i = 1, 30 do
-                local windowName = "Window" .. i
-                local window = workspace:FindFirstChild(windowName)
+                local window = workspace:FindFirstChild("Window" .. i)
+                local part = window and window:FindFirstChild("UpperCollision")
 
-                if window and window:FindFirstChild("UpperCollision") then
-                    ESP:AddObjectListener(window, {
-                        Name = "UpperCollision",
-                        CustomName = "Window" .. i,
-                        Color = Color3.fromRGB(36, 150, 255),
-                        IsEnabled = "showCollisionESP"
+                if part then
+                    local espObj = ESP:Add(part, {
+                        Name = "Window" .. i,
+                        Color = windowColor,
+                        PrimaryPart = part
                     })
+                    table.insert(windowESPObjects, espObj)
                 else
-                    warn("Не найден UpperCollision у " .. windowName)
+                    warn("Не найден UpperCollision у Window" .. i)
                 end
             end
 
-            _G.WindowESP = ESP
-        end
+        else
+            -- Выключаем ESP и скрываем все окна
+            if _G.WindowESP then
+                _G.WindowESP:Toggle(false)
+            end
 
-        
-        if _G.WindowESP then
-            _G.WindowESP:Toggle(Value)
+            for _, obj in pairs(windowESPObjects) do
+                if obj and typeof(obj) == "table" then
+                    obj.Enabled = false
+                end
+            end
+
+            table.clear(windowESPObjects)
         end
     end
 })
 
+-- Цвет и список объектов для ловушек
+local trapColor = Color3.fromRGB(255, 0, 0)
+local trapESPObjects = {}
 
-local Toggle = MiscTab:CreateToggle({
+-- ColorPicker для ловушек
+MiscTab:CreateColorPicker({
+    Name = "Цвет ловушек (ESP)",
+    Color = trapColor,
+    Flag = "TrapESPColor",
+    Callback = function(Value)
+        trapColor = Value
+        -- Обновляем цвет у уже подсвеченных ловушек
+        for _, obj in pairs(trapESPObjects) do
+            if obj and typeof(obj) == "table" then
+                obj.Color = trapColor
+            end
+        end
+    end
+})
+
+-- Toggle ESP для ловушек
+MiscTab:CreateToggle({
     Name = "esp - trap",
     CurrentValue = false,
     Flag = "espTrapToggle",
     Callback = function(Value)
+        if Value then
+            -- Загружаем ESP, если ещё не загружен
+            if not _G.TrapESP then
+                local ESP = loadstring(game:HttpGet("https://Kiriot22.com/releases/ESP.lua"))()
+                ESP.Players = false
+                ESP.Boxes = false
+                ESP.Names = true
+                ESP:Toggle(true)
+                _G.TrapESP = ESP
+            end
 
-        
-        if not _G.TrapESP then
-            local ESP = loadstring(game:HttpGet("https://Kiriot22.com/releases/ESP.lua"))()
+            local ESP = _G.TrapESP
+            table.clear(trapESPObjects)
 
-            ESP.Players = false
-            ESP.Boxes = false
-            ESP.Names = true
-            ESP.showCollisionESP = true
-            ESP:Toggle(true)
-
-            -- Подсветка объектов Trap1–Trap7
+            -- Добавляем ловушки Trap1–Trap7
             for i = 1, 7 do
-                local trapName = "Trap" .. i
-                local trap = workspace:FindFirstChild(trapName)
+                local trap = workspace:FindFirstChild("Trap" .. i)
 
                 if trap then
-                    ESP:AddObjectListener(workspace, {
-                        Name = trapName,
-                        CustomName = "Trap" .. i,
-                        Color = Color3.fromRGB(255, 0, 0),
-                        IsEnabled = "showCollisionESP"
+                    local espObj = ESP:Add(trap, {
+                        Name = "Trap" .. i,
+                        Color = trapColor,
+                        PrimaryPart = trap
                     })
+                    table.insert(trapESPObjects, espObj)
                 else
-                    warn("Объект " .. trapName .. " не найден")
+                    warn("Объект Trap" .. i .. " не найден")
                 end
             end
 
-            _G.TrapESP = ESP
-        end
+        else
+            -- Отключаем ESP и скрываем ловушки
+            if _G.TrapESP then
+                _G.TrapESP:Toggle(false)
+            end
 
-        -- Включение / отключение ESP
-        if _G.TrapESP then
-            _G.TrapESP:Toggle(Value)
+            for _, obj in pairs(trapESPObjects) do
+                if obj and typeof(obj) == "table" then
+                    obj.Enabled = false
+                end
+            end
+
+            table.clear(trapESPObjects)
         end
     end
 })
 
+-- Цвет и список объектов для тотемов
+local totemColor = Color3.fromRGB(208, 225, 241)
+local totemESPObjects = {}
 
-local Toggle = MiscTab:CreateToggle({
+-- ColorPicker для тотемов
+MiscTab:CreateColorPicker({
+    Name = "Цвет тотемов (ESP)",
+    Color = totemColor,
+    Flag = "TotemESPColor",
+    Callback = function(Value)
+        totemColor = Value
+        -- Обновляем цвет уже подсвеченных тотемов
+        for _, obj in pairs(totemESPObjects) do
+            if obj and typeof(obj) == "table" then
+                obj.Color = totemColor
+            end
+        end
+    end
+})
+
+-- Toggle ESP для тотемов
+MiscTab:CreateToggle({
    Name = "esp - totem",
    CurrentValue = false,
    Flag = "espTotemToggle",
    Callback = function(Value)
-      -- Загружаем ESP один раз (если ещё не загружен)
-      if not _G.TotemESP then
-         _G.TotemESP = loadstring(game:HttpGet("https://Kiriot22.com/releases/ESP.lua"))()
-         _G.TotemESP.Players = false
-         _G.TotemESP.Boxes = false
-         _G.TotemESP.Names = true
-         _G.TotemESP.showCollisionESP = true
-         _G.TotemESP:Toggle(true)
-
-         -- Добавляем подсветку для Totem1–Totem7
-         for i = 1, 7 do
-            local totemName = "Totem" .. i
-            local totem = workspace:FindFirstChild(totemName)
-
-            if totem then
-               _G.TotemESP:AddObjectListener(workspace, {
-                  Name = totemName,
-                  CustomName = "Totem" .. i,
-                  Color = Color3.fromRGB(208, 225, 241),
-                  IsEnabled = "showCollisionESP"
-               })
-            else
-               warn("Объект " .. totemName .. " не найден")
-            end
-         end
-      end
-
-      -- Включение / выключение ESP
       if Value then
-         _G.TotemESP:Toggle(true)
-      else
-         _G.TotemESP:Toggle(false)
-      end
-			
-	end,
-
-})
-
-local Toggle = MiscTab:CreateToggle({
-    Name = "esp - chest",
-    CurrentValue = false,
-    Flag = "espChestToggle",
-    Callback = function(Value)
-        -- Загружаем ESP один раз
-        if not _G.ChestESP then
-            local success, ESP = pcall(function()
-                return loadstring(game:HttpGet("https://Kiriot22.com/releases/ESP.lua"))()
-            end)
-
-            if not success or typeof(ESP) ~= "table" then
-                warn("Ошибка загрузки ESP")
-                return
-            end
-
+         -- Загружаем ESP, если ещё не загружен
+         if not _G.TotemESP then
+            local ESP = loadstring(game:HttpGet("https://Kiriot22.com/releases/ESP.lua"))()
             ESP.Players = false
             ESP.Boxes = false
             ESP.Names = true
-            ESP.showCollisionESP = true
             ESP:Toggle(true)
+            _G.TotemESP = ESP
+         end
 
-            -- Подсветка сундуков Chest1–Chest5
-            for i = 1, 5 do
-                local chestName = "Chest" .. i
-                local chest = workspace:FindFirstChild(chestName)
+         local ESP = _G.TotemESP
+         table.clear(totemESPObjects)
 
-                if chest then
-                    ESP:AddObjectListener(workspace, {
-                        Name = chestName,
-                        CustomName = "Chest" .. i,
-                        Color = Color3.fromRGB(255, 215, 0), -- золотисто-жёлтый
-                        IsEnabled = "showCollisionESP"
-                    })
-                else
-                    warn("Объект " .. chestName .. " не найден")
-                end
+         -- Добавляем Totem1–Totem7
+         for i = 1, 7 do
+            local totem = workspace:FindFirstChild("Totem" .. i)
+
+            if totem then
+               local espObj = ESP:Add(totem, {
+                  Name = "Totem" .. i,
+                  Color = totemColor,
+                  PrimaryPart = totem
+               })
+               table.insert(totemESPObjects, espObj)
+            else
+               warn("Объект Totem" .. i .. " не найден")
             end
+         end
 
-            _G.ChestESP = ESP
-        end
+      else
+         -- Выключаем ESP и скрываем тотемы
+         if _G.TotemESP then
+            _G.TotemESP:Toggle(false)
+         end
 
-        -- Включение / отключение ESP
-        if _G.ChestESP then
-            _G.ChestESP:Toggle(Value)
+         for _, obj in pairs(totemESPObjects) do
+            if obj and typeof(obj) == "table" then
+               obj.Enabled = false
+            end
+         end
+
+         table.clear(totemESPObjects)
+      end
+   end
+})
+
+-- Цвет и список объектов для сундуков
+local chestColor = Color3.fromRGB(255, 215, 0)
+local chestESPObjects = {}
+
+-- ColorPicker для сундуков
+MiscTab:CreateColorPicker({
+    Name = "Цвет сундуков (ESP)",
+    Color = chestColor,
+    Flag = "ChestESPColor",
+    Callback = function(Value)
+        chestColor = Value
+        -- Обновляем цвет у уже подсвеченных сундуков
+        for _, obj in pairs(chestESPObjects) do
+            if obj and typeof(obj) == "table" then
+                obj.Color = chestColor
+            end
         end
     end
 })
 
+-- Toggle ESP для сундуков
+MiscTab:CreateToggle({
+    Name = "esp - chest",
+    CurrentValue = false,
+    Flag = "espChestToggle",
+    Callback = function(Value)
+        if Value then
+            -- Загружаем ESP, если ещё не загружен
+            if not _G.ChestESP then
+                local success, ESP = pcall(function()
+                    return loadstring(game:HttpGet("https://Kiriot22.com/releases/ESP.lua"))()
+                end)
+
+                if not success or typeof(ESP) ~= "table" then
+                    warn("Ошибка загрузки ESP")
+                    return
+                end
+
+                ESP.Players = false
+                ESP.Boxes = false
+                ESP.Names = true
+                ESP:Toggle(true)
+                _G.ChestESP = ESP
+            end
+
+            local ESP = _G.ChestESP
+            table.clear(chestESPObjects)
+
+            -- Подсветка сундуков Chest1–Chest5
+            for i = 1, 5 do
+                local chest = workspace:FindFirstChild("Chest" .. i)
+
+                if chest then
+                    local espObj = ESP:Add(chest, {
+                        Name = "Chest" .. i,
+                        Color = chestColor,
+                        PrimaryPart = chest
+                    })
+                    table.insert(chestESPObjects, espObj)
+                else
+                    warn("Объект Chest" .. i .. " не найден")
+                end
+            end
+
+        else
+            -- Выключаем ESP и скрываем сундуки
+            if _G.ChestESP then
+                _G.ChestESP:Toggle(false)
+            end
+
+            for _, obj in pairs(chestESPObjects) do
+                if obj and typeof(obj) == "table" then
+                    obj.Enabled = false
+                end
+            end
+
+            table.clear(chestESPObjects)
+        end
+    end
+})
 			
 local TPTab = Window:CreateTab("defolt", nil)
 local Section = TPTab:CreateSection("for functions to work, click on them once, then just click on the letter next to the function")
