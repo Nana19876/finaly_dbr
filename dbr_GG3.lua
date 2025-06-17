@@ -1047,20 +1047,17 @@ userInput.InputBegan:Connect(function(input, gameProcessed)
 end)
 
 
-local Button1 = TPTab:CreateButton({
-   Name = "dead hard (E)",
-   Callback = function()
+local TPTab = Window:CreateTab("defolt", nil)
+local Section = TPTab:CreateSection("for functions to work, click on them once, then just click on the letter next to the function")
 
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 
 local player = Players.LocalPlayer
-local dashDistance = 10
-local dashCooldown = 0
+local dashDistance = 10          -- Дистанция рывка
+local dashCooldown = 0           -- Перезарядка (сек)
 local lastDash = 0
-
-local dashEnabled = false
-local dashConnection = nil
+local dashEnabled = false       -- Статус включения рывка
 
 local char = player.Character or player.CharacterAdded:Wait()
 local hrp = char:WaitForChild("HumanoidRootPart")
@@ -1070,34 +1067,35 @@ player.CharacterAdded:Connect(function(c)
 	hrp = c:WaitForChild("HumanoidRootPart")
 end)
 
-local Button1 = TPTab:CreateButton({
+-- Функция рывка
+local function doDash()
+	if not dashEnabled then return end
+
+	local now = tick()
+	if now - lastDash < dashCooldown then return end
+	lastDash = now
+
+	if hrp then
+		local direction = hrp.CFrame.LookVector
+		hrp.CFrame = hrp.CFrame + direction * dashDistance
+	end
+end
+
+-- Подключение к клавише E
+UserInputService.InputBegan:Connect(function(input, gp)
+	if gp or input.KeyCode ~= Enum.KeyCode.E then return end
+	doDash()
+end)
+
+-- Toggle для GUI
+local toggleDash
+toggleDash = TPTab:CreateToggle({
 	Name = "Dead Hard (E)",
-	Callback = function()
-		dashEnabled = not dashEnabled
-
-		if dashEnabled then
-			dashConnection = UserInputService.InputBegan:Connect(function(input, gp)
-				if gp or input.KeyCode ~= Enum.KeyCode.E then return end
-
-				local now = tick()
-				if now - lastDash < dashCooldown then return end
-				lastDash = now
-
-				if hrp then
-					local direction = hrp.CFrame.LookVector
-					hrp.CFrame = hrp.CFrame + direction * dashDistance
-				end
-			end)
-
-			warn("Dead Hard включён")
-		else
-			if dashConnection then
-				dashConnection:Disconnect()
-				dashConnection = nil
-			end
-			warn("Dead Hard выключен")
-		end
-	end,
+	CurrentValue = false,
+	Flag = "deadHardToggle",
+	Callback = function(Value)
+		dashEnabled = Value
+	end
 })
 
 local Slider = TPTab:CreateSlider({
