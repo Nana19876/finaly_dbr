@@ -1090,7 +1090,7 @@ MiscTab:CreateToggle({
 local totemColor = Color3.fromRGB(208, 225, 241)
 local totemESPObjects = {}
 
--- ColorPicker для тотемов
+-- 🎨 ColorPicker для тотемов
 MiscTab:CreateColorPicker({
     Name = "Цвет тотемов (ESP)",
     Color = totemColor,
@@ -1105,14 +1105,33 @@ MiscTab:CreateColorPicker({
     end
 })
 
--- Toggle ESP для тотемов
+-- Цвет и список ESP-объектов для тотемов
+local totemColor = Color3.fromRGB(208, 225, 241)
+local totemESPObjects = {}
+
+-- 🎨 ColorPicker для тотемов
+MiscTab:CreateColorPicker({
+    Name = "Цвет тотемов (ESP)",
+    Color = totemColor,
+    Flag = "TotemESPColor",
+    Callback = function(Value)
+        totemColor = Value
+        for _, obj in pairs(totemESPObjects) do
+            if obj and typeof(obj) == "table" then
+                obj.Color = totemColor
+            end
+        end
+    end
+})
+
+-- 🔘 Toggle ESP для тотемов
 MiscTab:CreateToggle({
     Name = "esp - totem",
     CurrentValue = false,
     Flag = "espTotemToggle",
     Callback = function(Value)
         if Value then
-            -- Инициализация ESP (если не был создан ранее)
+            -- Загружаем ESP при первом включении
             if not _G.TotemESP then
                 local ESP = loadstring(game:HttpGet("https://Kiriot22.com/releases/ESP.lua"))()
                 ESP.Players = false
@@ -1126,7 +1145,7 @@ MiscTab:CreateToggle({
 
             local ESP = _G.TotemESP
 
-            -- Удаляем старые объекты Totem из ESP.Objects
+            -- Удаляем старые объекты из ESP.Objects
             if ESP.Objects then
                 for i = #ESP.Objects, 1, -1 do
                     local obj = ESP.Objects[i]
@@ -1142,10 +1161,10 @@ MiscTab:CreateToggle({
             -- Добавляем Totem1–Totem7
             for i = 1, 7 do
                 local totem = workspace:FindFirstChild("Totem" .. i)
-
                 if totem then
                     local espObj = ESP:Add(totem, {
-                        Name = "Totem" .. i,
+                        Name = "Totem" .. i,           -- внутреннее имя
+                        CustomName = "Totem",          -- отображаемая надпись
                         Color = totemColor,
                         PrimaryPart = totem
                     })
@@ -1171,31 +1190,12 @@ MiscTab:CreateToggle({
     end
 })
 
--- Цвет и список объектов для сундуков
-local chestColor = Color3.fromRGB(255, 215, 0)
-local chestESPObjects = {}
-
--- ColorPicker для сундуков
-MiscTab:CreateColorPicker({
-    Name = "Цвет сундуков (ESP)",
-    Color = chestColor,
-    Flag = "ChestESPColor",
-    Callback = function(Value)
-        chestColor = Value
-        -- Обновляем цвет у уже подсвеченных сундуков
-        for _, obj in pairs(chestESPObjects) do
-            if obj and typeof(obj) == "table" then
-                obj.Color = chestColor
-            end
-        end
-    end
-})
 
 -- Цвет и список ESP-объектов для сундуков
 local chestColor = Color3.fromRGB(255, 215, 0)
 local chestESPObjects = {}
 
--- ColorPicker для сундуков
+-- 🎨 ColorPicker для сундуков
 MiscTab:CreateColorPicker({
     Name = "Цвет сундуков (ESP)",
     Color = chestColor,
@@ -1210,14 +1210,14 @@ MiscTab:CreateColorPicker({
     end
 })
 
--- Toggle ESP для сундуков
+-- 🔘 Toggle ESP для сундуков
 MiscTab:CreateToggle({
     Name = "esp - chest",
     CurrentValue = false,
     Flag = "espChestToggle",
     Callback = function(Value)
         if Value then
-            -- Загружаем ESP при первом включении
+            -- Загрузка ESP при первом включении
             if not _G.ChestESP then
                 local success, ESP = pcall(function()
                     return loadstring(game:HttpGet("https://Kiriot22.com/releases/ESP.lua"))()
@@ -1239,7 +1239,7 @@ MiscTab:CreateToggle({
 
             local ESP = _G.ChestESP
 
-            -- Удаление старых объектов из ESP.Objects
+            -- Удаляем старые объекты из ESP.Objects
             if ESP.Objects then
                 for i = #ESP.Objects, 1, -1 do
                     local obj = ESP.Objects[i]
@@ -1249,15 +1249,16 @@ MiscTab:CreateToggle({
                 end
             end
 
-            -- Очистка локального списка
+            -- Очищаем локальный список
             table.clear(chestESPObjects)
 
-            -- Добавление Chest1–Chest5
+            -- Добавляем сундуки Chest1–Chest5
             for i = 1, 5 do
                 local chest = workspace:FindFirstChild("Chest" .. i)
                 if chest then
                     local espObj = ESP:Add(chest, {
-                        Name = "Chest" .. i,
+                        Name = "Chest" .. i,           -- для логики
+                        CustomName = "Chest",          -- отображаемая надпись
                         Color = chestColor,
                         PrimaryPart = chest
                     })
@@ -1282,6 +1283,7 @@ MiscTab:CreateToggle({
         end
     end
 })
+
 
 			
 local TPTab = Window:CreateTab("defolt", nil)
