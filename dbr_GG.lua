@@ -1152,35 +1152,46 @@ end)
    end,
 })
 
-local Button1 = TPTab:CreateButton({
-   Name = "jump (space)",
-   Callback = function()
-
 local UserInputService = game:GetService("UserInputService")
 local Players = game:GetService("Players")
 
 local player = Players.LocalPlayer
+local jumpEnabled = false
+local jumpConnection = nil
+
 local char = player.Character or player.CharacterAdded:Wait()
 local hrp = char:WaitForChild("HumanoidRootPart")
-
 
 player.CharacterAdded:Connect(function(c)
 	char = c
 	hrp = char:WaitForChild("HumanoidRootPart")
 end)
 
-			
-UserInputService.InputBegan:Connect(function(input, gameProcessed)
-	if gameProcessed then return end
-	if input.KeyCode == Enum.KeyCode.Space then
+local JumpToggle = TPTab:CreateToggle({
+	Name = "Jump (Space)",
+	CurrentValue = false,
+	Flag = "jumpToggle",
+	Callback = function(Value)
+		jumpEnabled = Value
 
-		hrp.Velocity = Vector3.new(hrp.Velocity.X, 60, hrp.Velocity.Z)
-
+		if jumpEnabled then
+			jumpConnection = UserInputService.InputBegan:Connect(function(input, gameProcessed)
+				if gameProcessed then return end
+				if input.KeyCode == Enum.KeyCode.Space then
+					if hrp then
+						hrp.Velocity = Vector3.new(hrp.Velocity.X, 60, hrp.Velocity.Z)
+					end
+				end
+			end)
+			warn("Jump включён")
+		else
+			if jumpConnection then
+				jumpConnection:Disconnect()
+				jumpConnection = nil
+			end
+			warn("Jump выключен")
+		end
 	end
-end)
-
-	end,
-
 })
 
 local Button1 = TPTab:CreateButton({
