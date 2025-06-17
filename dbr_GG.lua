@@ -965,82 +965,87 @@ local Toggle = MiscTab:CreateToggle({
 local TPTab = Window:CreateTab("defolt", nil)
 local Section = TPTab:CreateSection("for functions to work, click on them once, then just click on the letter next to the function")
 
+local player = game.Players.LocalPlayer
+local userInput = game:GetService("UserInputService")
+local rs = game:GetService("RunService")
+local camera = workspace.CurrentCamera
+
+local speed = 60
 local noclipConnection
 local noclipRunning = false
+local lastUpdate = tick()
 
-local Toggle = TPTab:CreateToggle({
-    Name = "noclip",
+-- Функция для движения
+local function getNextMovement(deltaTime)
+    local nextMove = Vector3.new()
+    local cameraCFrame = camera.CFrame
+    local forward = cameraCFrame.LookVector
+    local right = cameraCFrame.RightVector
+
+    if userInput:IsKeyDown(Enum.KeyCode.W) then
+        nextMove += forward
+    elseif userInput:IsKeyDown(Enum.KeyCode.S) then
+        nextMove -= forward
+    end
+
+    if userInput:IsKeyDown(Enum.KeyCode.A) then
+        nextMove -= right
+    elseif userInput:IsKeyDown(Enum.KeyCode.D) then
+        nextMove += right
+    end
+
+    return nextMove * (speed * deltaTime)
+end
+
+-- Активация/деактивация noclip
+local function setNoClipState(state)
+    noclipRunning = state
+    local char = player.Character
+    if not char then return end
+    local humanoid = char:FindFirstChild("Humanoid")
+    local root = char:FindFirstChild("HumanoidRootPart")
+    if not humanoid or not root then return end
+
+    if state then
+        humanoid.PlatformStand = true
+        root.Anchored = true
+
+        noclipConnection = rs.RenderStepped:Connect(function()
+            local delta = tick() - lastUpdate
+            local move = getNextMovement(delta)
+            root.CFrame = root.CFrame + move
+            lastUpdate = tick()
+        end)
+    else
+        if noclipConnection then
+            noclipConnection:Disconnect()
+            noclipConnection = nil
+        end
+        humanoid.PlatformStand = false
+        root.Anchored = false
+    end
+end
+
+-- GUI переключатель
+local toggleRef
+toggleRef = TPTab:CreateToggle({
+    Name = "noclip (V)",
     CurrentValue = false,
     Flag = "noclipToggle",
     Callback = function(Value)
-        local player = game.Players.LocalPlayer
-        local userInput = game:GetService("UserInputService")
-        local rs = game:GetService("RunService")
-        local camera = workspace.CurrentCamera
-
-        local speed = 60
-        local lastUpdate = tick()
-
-        local function getNextMovement(deltaTime)
-            local nextMove = Vector3.new()
-            local cameraCFrame = camera.CFrame
-            local forward = cameraCFrame.LookVector
-            local right = cameraCFrame.RightVector
-
-            if userInput:IsKeyDown(Enum.KeyCode.W) then
-                nextMove += forward
-            elseif userInput:IsKeyDown(Enum.KeyCode.S) then
-                nextMove -= forward
-            end
-
-            if userInput:IsKeyDown(Enum.KeyCode.A) then
-                nextMove -= right
-            elseif userInput:IsKeyDown(Enum.KeyCode.D) then
-                nextMove += right
-            end
-
-            return nextMove * (speed * deltaTime)
-        end
-
-        -- Включение noclip
-        if Value and not noclipRunning then
-            noclipRunning = true
-            local char = player.Character
-            if char then
-                local humanoid = char:WaitForChild("Humanoid")
-                local root = char:WaitForChild("HumanoidRootPart")
-
-                humanoid.PlatformStand = true
-                root.Anchored = true
-
-                noclipConnection = rs.RenderStepped:Connect(function()
-                    local delta = tick() - lastUpdate
-                    local move = getNextMovement(delta)
-                    root.CFrame = root.CFrame + move
-                    lastUpdate = tick()
-                end)
-            end
-        end
-
-        -- Выключение noclip
-        if not Value and noclipRunning then
-            noclipRunning = false
-            if noclipConnection then
-                noclipConnection:Disconnect()
-                noclipConnection = nil
-            end
-
-            local char = player.Character
-            if char then
-                local humanoid = char:FindFirstChild("Humanoid")
-                local root = char:FindFirstChild("HumanoidRootPart")
-
-                if humanoid then humanoid.PlatformStand = false end
-                if root then root.Anchored = false end
-            end
-        end
+        setNoClipState(Value)
     end
 })
+
+-- Обработка клавиши V
+userInput.InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end
+    if input.KeyCode == Enum.KeyCode.V then
+        local newState = not noclipRunning
+        toggleRef:Set(newState)  -- обновляем визуальный переключатель и логику
+    end
+end)
+
 
 local Button1 = TPTab:CreateButton({
    Name = "dead hard (E)",
