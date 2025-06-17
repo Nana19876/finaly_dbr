@@ -654,307 +654,243 @@ end)
 	
 })
 
+local MiscTab = Window:CreateTab("misc", nil)
+local Section = MiscTab:CreateSection("esp")
+
+-- ✅ ESP - GENERATOR
 local Toggle = MiscTab:CreateToggle({
-   Name = "esp - generator",
-   CurrentValue = false,
-   Flag = "espGeneratorToggle",
-   Callback = function(Value)
+    Name = "esp - generator",
+    CurrentValue = false,
+    Flag = "espGeneratorToggle",
+    Callback = function(Value)
+        if not _G.GeneratorESP then
+            local ESP = loadstring(game:HttpGet("https://Kiriot22.com/releases/ESP.lua"))()
+            ESP.Players = false
+            ESP.Boxes = false
+            ESP.Names = true
+            ESP:Toggle(true)
 
-     
-      if not _G.GeneratorESP then
-         _G.GeneratorESP = loadstring(game:HttpGet("https://Kiriot22.com/releases/ESP.lua"))()
-         _G.GeneratorESP.Players = false
-         _G.GeneratorESP.Boxes = false
-         _G.GeneratorESP.Names = true
-         _G.GeneratorESP.showGeneratorESP = true
+            for i = 1, 7 do
+                local objName = "Generator" .. i
+                local obj = workspace:FindFirstChild(objName)
 
-         
-         for i = 1, 7 do
-            local generatorName = "Generator" .. i
-            local generator = workspace:FindFirstChild(generatorName)
-
-            if generator and generator:FindFirstChild("CollisionBox") then
-               _G.GeneratorESP:AddObjectListener(generator, {
-                  Name = "CollisionBox",
-                  CustomName = "Generator" .. i,
-                  Color = Color3.fromRGB(0, 255, 255),
-                  IsEnabled = "showGeneratorESP"
-               })
-            else
-               warn("Не найден CollisionBox у " .. generatorName)
+                if obj and obj:FindFirstChild("CollisionBox") then
+                    ESP:AddObjectListener(obj, {
+                        Name = "CollisionBox",
+                        CustomName = objName,
+                        Color = Color3.fromRGB(0, 255, 255),
+                        IsEnabled = function()
+                            return true
+                        end
+                    })
+                else
+                    warn("Не найден CollisionBox у " .. objName)
+                end
             end
-         end
-      end
 
-      
-      if Value then
-         _G.GeneratorESP:Toggle(true)
-      else
-         _G.GeneratorESP:Toggle(false)
-      end
-   end
+            _G.GeneratorESP = ESP
+        end
+
+        if _G.GeneratorESP then
+            _G.GeneratorESP:Toggle(Value)
+        end
+    end
 })
 
-
+-- ✅ ESP - PALLET
 local Toggle = MiscTab:CreateToggle({
     Name = "esp - pallet",
     CurrentValue = false,
     Flag = "espPalletToggle",
     Callback = function(Value)
-
-        
         if not _G.PalletESP then
             local ESP = loadstring(game:HttpGet("https://Kiriot22.com/releases/ESP.lua"))()
-
             ESP.Players = false
             ESP.Boxes = false
             ESP.Names = true
-            ESP.showCollisionESP = true
             ESP:Toggle(true)
 
-            
             for i = 1, 30 do
-                local palletName = "Pallet" .. i
-                local pallet = workspace:FindFirstChild(palletName)
+                local objName = "Pallet" .. i
+                local obj = workspace:FindFirstChild(objName)
 
-                if pallet and pallet:FindFirstChild("Panel") then
-                    ESP:AddObjectListener(pallet.Panel, {
+                if obj and obj:FindFirstChild("ModelCollision") then
+                    ESP:AddObjectListener(obj, {
                         Name = "ModelCollision",
-                        CustomName = "Pallet" .. i,
+                        CustomName = objName,
                         Color = Color3.fromRGB(85, 110, 247),
-                        IsEnabled = "showCollisionESP"
+                        IsEnabled = function()
+                            return true
+                        end
                     })
                 else
-                    warn("Не найдена панель у " .. palletName)
+                    warn("Не найден ModelCollision у " .. objName)
                 end
             end
 
             _G.PalletESP = ESP
         end
 
-        
-        if Value then
-            _G.PalletESP:Toggle(true)
-        else
-            _G.PalletESP:Toggle(false)
+        if _G.PalletESP then
+            _G.PalletESP:Toggle(Value)
         end
     end
 })
 
-
-local Toggle = MiscTab:CreateToggle({
-    Name = "esp - hatch",
-    CurrentValue = false,
-    Flag = "espHatchToggle",
-    Callback = function(Value)
-
-        
-        if not _G.HatchESP then
-            local ESP = loadstring(game:HttpGet("https://Kiriot22.com/releases/ESP.lua"))()
-
-            ESP.Players = false
-            ESP.Boxes = false
-            ESP.Names = true
-            ESP.showCollisionESP = true
-            ESP:Toggle(true)
-
-            -- Подсветка Hatch.Visual.Rim
-            local hatch = workspace:FindFirstChild("Hatch")
-            if hatch and hatch:FindFirstChild("Visual") and hatch.Visual:FindFirstChild("Rim") then
-                ESP:AddObjectListener(hatch.Visual, {
-                    Name = "Rim",
-                    CustomName = "Hatch",
-                    Color = Color3.fromRGB(0, 255, 0),
-                    IsEnabled = "showCollisionESP"
-                })
-            else
-                warn("Объект Hatch.Visual.Rim не найден")
-            end
-
-            _G.HatchESP = ESP
-        end
-
-        
-        if _G.HatchESP then
-            _G.HatchESP:Toggle(Value)
-        end
-    end
-})
-
+-- ✅ ESP - WINDOW
 local Toggle = MiscTab:CreateToggle({
     Name = "esp - window",
     CurrentValue = false,
     Flag = "espWindowToggle",
     Callback = function(Value)
-
-        
         if not _G.WindowESP then
             local ESP = loadstring(game:HttpGet("https://Kiriot22.com/releases/ESP.lua"))()
-
             ESP.Players = false
             ESP.Boxes = false
             ESP.Names = true
-            ESP.showCollisionESP = true
             ESP:Toggle(true)
 
-            -- Подсветка окон Window1–Window30 (если есть UpperCollision)
             for i = 1, 30 do
-                local windowName = "Window" .. i
-                local window = workspace:FindFirstChild(windowName)
+                local objName = "Window" .. i
+                local obj = workspace:FindFirstChild(objName)
 
-                if window and window:FindFirstChild("UpperCollision") then
-                    ESP:AddObjectListener(window, {
+                if obj and obj:FindFirstChild("UpperCollision") then
+                    ESP:AddObjectListener(obj, {
                         Name = "UpperCollision",
-                        CustomName = "Window" .. i,
+                        CustomName = objName,
                         Color = Color3.fromRGB(36, 150, 255),
-                        IsEnabled = "showCollisionESP"
+                        IsEnabled = function()
+                            return true
+                        end
                     })
                 else
-                    warn("Не найден UpperCollision у " .. windowName)
+                    warn("Не найден UpperCollision у " .. objName)
                 end
             end
 
             _G.WindowESP = ESP
         end
 
-        
         if _G.WindowESP then
             _G.WindowESP:Toggle(Value)
         end
     end
 })
 
-
+-- ✅ ESP - TRAP
 local Toggle = MiscTab:CreateToggle({
     Name = "esp - trap",
     CurrentValue = false,
     Flag = "espTrapToggle",
     Callback = function(Value)
-
-        
         if not _G.TrapESP then
             local ESP = loadstring(game:HttpGet("https://Kiriot22.com/releases/ESP.lua"))()
-
             ESP.Players = false
             ESP.Boxes = false
             ESP.Names = true
-            ESP.showCollisionESP = true
             ESP:Toggle(true)
 
-            -- Подсветка объектов Trap1–Trap7
             for i = 1, 7 do
-                local trapName = "Trap" .. i
-                local trap = workspace:FindFirstChild(trapName)
+                local objName = "Trap" .. i
+                local obj = workspace:FindFirstChild(objName)
 
-                if trap then
+                if obj then
                     ESP:AddObjectListener(workspace, {
-                        Name = trapName,
-                        CustomName = "Trap" .. i,
+                        Name = objName,
+                        CustomName = objName,
                         Color = Color3.fromRGB(255, 0, 0),
-                        IsEnabled = "showCollisionESP"
+                        IsEnabled = function()
+                            return true
+                        end
                     })
                 else
-                    warn("Объект " .. trapName .. " не найден")
+                    warn("Объект " .. objName .. " не найден")
                 end
             end
 
             _G.TrapESP = ESP
         end
 
-        -- Включение / отключение ESP
         if _G.TrapESP then
             _G.TrapESP:Toggle(Value)
         end
     end
 })
 
-
+-- ✅ ESP - TOTEM
 local Toggle = MiscTab:CreateToggle({
-   Name = "esp - totem",
-   CurrentValue = false,
-   Flag = "espTotemToggle",
-   Callback = function(Value)
-      -- Загружаем ESP один раз (если ещё не загружен)
-      if not _G.TotemESP then
-         _G.TotemESP = loadstring(game:HttpGet("https://Kiriot22.com/releases/ESP.lua"))()
-         _G.TotemESP.Players = false
-         _G.TotemESP.Boxes = false
-         _G.TotemESP.Names = true
-         _G.TotemESP.showCollisionESP = true
-         _G.TotemESP:Toggle(true)
+    Name = "esp - totem",
+    CurrentValue = false,
+    Flag = "espTotemToggle",
+    Callback = function(Value)
+        if not _G.TotemESP then
+            local ESP = loadstring(game:HttpGet("https://Kiriot22.com/releases/ESP.lua"))()
+            ESP.Players = false
+            ESP.Boxes = false
+            ESP.Names = true
+            ESP:Toggle(true)
 
-         -- Добавляем подсветку для Totem1–Totem7
-         for i = 1, 7 do
-            local totemName = "Totem" .. i
-            local totem = workspace:FindFirstChild(totemName)
+            for i = 1, 7 do
+                local objName = "Totem" .. i
+                local obj = workspace:FindFirstChild(objName)
 
-            if totem then
-               _G.TotemESP:AddObjectListener(workspace, {
-                  Name = totemName,
-                  CustomName = "Totem" .. i,
-                  Color = Color3.fromRGB(208, 225, 241),
-                  IsEnabled = "showCollisionESP"
-               })
-            else
-               warn("Объект " .. totemName .. " не найден")
+                if obj then
+                    ESP:AddObjectListener(workspace, {
+                        Name = objName,
+                        CustomName = objName,
+                        Color = Color3.fromRGB(208, 225, 241),
+                        IsEnabled = function()
+                            return true
+                        end
+                    })
+                else
+                    warn("Объект " .. objName .. " не найден")
+                end
             end
-         end
-      end
 
-      -- Включение / выключение ESP
-      if Value then
-         _G.TotemESP:Toggle(true)
-      else
-         _G.TotemESP:Toggle(false)
-      end
-			
-	end,
+            _G.TotemESP = ESP
+        end
 
+        if _G.TotemESP then
+            _G.TotemESP:Toggle(Value)
+        end
+    end
 })
 
+-- ✅ ESP - CHEST
 local Toggle = MiscTab:CreateToggle({
     Name = "esp - chest",
     CurrentValue = false,
     Flag = "espChestToggle",
     Callback = function(Value)
-        -- Загружаем ESP один раз
         if not _G.ChestESP then
-            local success, ESP = pcall(function()
-                return loadstring(game:HttpGet("https://Kiriot22.com/releases/ESP.lua"))()
-            end)
-
-            if not success or typeof(ESP) ~= "table" then
-                warn("Ошибка загрузки ESP")
-                return
-            end
-
+            local ESP = loadstring(game:HttpGet("https://Kiriot22.com/releases/ESP.lua"))()
             ESP.Players = false
             ESP.Boxes = false
             ESP.Names = true
-            ESP.showCollisionESP = true
             ESP:Toggle(true)
 
-            -- Подсветка сундуков Chest1–Chest5
             for i = 1, 5 do
-                local chestName = "Chest" .. i
-                local chest = workspace:FindFirstChild(chestName)
+                local objName = "Chest" .. i
+                local obj = workspace:FindFirstChild(objName)
 
-                if chest then
+                if obj then
                     ESP:AddObjectListener(workspace, {
-                        Name = chestName,
-                        CustomName = "Chest" .. i,
-                        Color = Color3.fromRGB(255, 215, 0), -- золотисто-жёлтый
-                        IsEnabled = "showCollisionESP"
+                        Name = objName,
+                        CustomName = objName,
+                        Color = Color3.fromRGB(255, 215, 0),
+                        IsEnabled = function()
+                            return true
+                        end
                     })
                 else
-                    warn("Объект " .. chestName .. " не найден")
+                    warn("Объект " .. objName .. " не найден")
                 end
             end
 
             _G.ChestESP = ESP
         end
 
-        -- Включение / отключение ESP
         if _G.ChestESP then
             _G.ChestESP:Toggle(Value)
         end
