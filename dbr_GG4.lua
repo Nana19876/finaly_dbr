@@ -1422,6 +1422,159 @@ AnimationTab:CreateButton({
    end,
 })
 
+-- Кнопка: SearchChest
+AnimationTab:CreateButton({
+   Name = "animation (close hutch)",
+   Callback = function()
+       local Players = game:GetService("Players")
+       local player = Players.LocalPlayer
+       local character = player.Character or player.CharacterAdded:Wait()
+       local humanoid = character:WaitForChild("Humanoid")
+
+       local anim = Instance.new("Animation")
+       anim.AnimationId = "rbxassetid://12557051802"
+
+       local animTrack = humanoid:LoadAnimation(anim)
+       animTrack:Play()
+   end,
+})
+
+-- Кнопка: SearchChest
+AnimationTab:CreateButton({
+   Name = "animation (greeting)",
+   Callback = function()
+       local Players = game:GetService("Players")
+       local player = Players.LocalPlayer
+       local character = player.Character or player.CharacterAdded:Wait()
+       local humanoid = character:WaitForChild("Humanoid")
+
+       local anim = Instance.new("Animation")
+       anim.AnimationId = "rbxassetid://94996092165026"
+
+       local animTrack = humanoid:LoadAnimation(anim)
+       animTrack:Play()
+   end,
+})
+
+-- Кнопка: SearchChest
+AnimationTab:CreateButton({
+   Name = "animation (greeting)",
+   Callback = function()
+       local Players = game:GetService("Players")
+       local player = Players.LocalPlayer
+       local character = player.Character or player.CharacterAdded:Wait()
+       local humanoid = character:WaitForChild("Humanoid")
+
+       local anim = Instance.new("Animation")
+       anim.AnimationId = "rbxassetid://94996092165026"
+
+       local animTrack = humanoid:LoadAnimation(anim)
+       animTrack:Play()
+   end,
+})
+
+-- Кнопка: SearchChest
+AnimationTab:CreateButton({
+   Name = "animation (medkit)",
+   Callback = function()
+       local Players = game:GetService("Players")
+       local player = Players.LocalPlayer
+       local character = player.Character or player.CharacterAdded:Wait()
+       local humanoid = character:WaitForChild("Humanoid")
+
+       local anim = Instance.new("Animation")
+       anim.AnimationId = "rbxassetid://102741425499863"
+
+       local animTrack = humanoid:LoadAnimation(anim)
+       animTrack:Play()
+   end,
+})
+
+-- Кнопка: SearchChest
+AnimationTab:CreateButton({
+   Name = "animation (MisAnim)",
+   Callback = function()
+       local Players = game:GetService("Players")
+       local player = Players.LocalPlayer
+       local character = player.Character or player.CharacterAdded:Wait()
+       local humanoid = character:WaitForChild("Humanoid")
+
+       local anim = Instance.new("Animation")
+       anim.AnimationId = "rbxassetid://131682837184136"
+
+       local animTrack = humanoid:LoadAnimation(anim)
+       animTrack:Play()
+   end,
+})
+
+-- Кнопка: SearchChest
+AnimationTab:CreateButton({
+   Name = "animation (Craft_shard)",
+   Callback = function()
+       local Players = game:GetService("Players")
+       local player = Players.LocalPlayer
+       local character = player.Character or player.CharacterAdded:Wait()
+       local humanoid = character:WaitForChild("Humanoid")
+
+       local anim = Instance.new("Animation")
+       anim.AnimationId = "rbxassetid://14534530685"
+
+       local animTrack = humanoid:LoadAnimation(anim)
+       animTrack:Play()
+   end,
+})
+
+-- Кнопка: SearchChest
+AnimationTab:CreateButton({
+   Name = "animation (Craft_shard)",
+   Callback = function()
+       local Players = game:GetService("Players")
+       local player = Players.LocalPlayer
+       local character = player.Character or player.CharacterAdded:Wait()
+       local humanoid = character:WaitForChild("Humanoid")
+
+       local anim = Instance.new("Animation")
+       anim.AnimationId = "rbxassetid://14534530685"
+
+       local animTrack = humanoid:LoadAnimation(anim)
+       animTrack:Play()
+   end,
+})
+
+-- Кнопка: SearchChest
+AnimationTab:CreateButton({
+   Name = "animation (close_hatch)",
+   Callback = function()
+       local Players = game:GetService("Players")
+       local player = Players.LocalPlayer
+       local character = player.Character or player.CharacterAdded:Wait()
+       local humanoid = character:WaitForChild("Humanoid")
+
+       local anim = Instance.new("Animation")
+       anim.AnimationId = "rbxassetid://12557051802"
+
+       local animTrack = humanoid:LoadAnimation(anim)
+       animTrack:Play()
+   end,
+})
+
+-- Кнопка: SearchChest
+AnimationTab:CreateButton({
+   Name = "animation (crush_totem)",
+   Callback = function()
+       local Players = game:GetService("Players")
+       local player = Players.LocalPlayer
+       local character = player.Character or player.CharacterAdded:Wait()
+       local humanoid = character:WaitForChild("Humanoid")
+
+       local anim = Instance.new("Animation")
+       anim.AnimationId = "rbxassetid://17245845923"
+
+       local animTrack = humanoid:LoadAnimation(anim)
+       animTrack:Play()
+   end,
+})
+
 AnimationTab:CreateButton({
     Name = "Stop All Animations",
     Callback = function()
