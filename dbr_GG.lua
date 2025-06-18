@@ -1001,7 +1001,7 @@ MiscTab:CreateToggle({
     end
 })
 
--- Toggle ESP для тотемов
+-- Toggle ESP для тотемов (используется Totem#.Collider)
 MiscTab:CreateToggle({
     Name = "esp - totem",
     CurrentValue = false,
@@ -1035,20 +1035,20 @@ MiscTab:CreateToggle({
             -- Очищаем текущие объекты
             table.clear(totemESPObjects)
 
-            -- Добавляем Totem1–Totem7
+            -- Добавляем Totem1–Totem7 с Collider
             for i = 1, 7 do
                 local totem = workspace:FindFirstChild("Totem" .. i)
-                local part = totem and totem:FindFirstChild("Root")
+                local part = totem and totem:FindFirstChild("Collider")
 
                 if part then
                     local espObj = ESP:Add(part, {
                         Name = "Totem" .. i,
-                        Color = Color3.fromRGB(255, 255, 0), -- можно изменить на любой цвет
+                        Color = Color3.fromRGB(255, 255, 0),
                         PrimaryPart = part
                     })
                     table.insert(totemESPObjects, espObj)
                 else
-                    warn("Не найден Root у Totem" .. i)
+                    warn("Не найден Collider у Totem" .. i)
                 end
             end
 
