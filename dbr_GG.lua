@@ -1463,52 +1463,43 @@ local Button1 = TPTab:CreateButton({
    end
 })
 
+local Button1 = TPTab:CreateButton({
+   Name = "BlinkSpeedBoost",
+   Callback = function()
+
 local speedModule = require(game.ReplicatedStorage.Modules.Code.Speeds)
+
 local player = game.Players.LocalPlayer
 local character = player.Character or player.CharacterAdded:Wait()
+
+-- Настройки
 local speedId = "BlinkSpeedBoost"
+local boostValue = 5
 
--- Запасной флаг, чтобы избежать повторных подключений
-local blinkConnectionRunning = false
+-- Ждём Blink-модель
+local blinkModel = character:WaitForChild("Blink", 10)
+if not blinkModel then
+	warn("❌ Blink не найден")
+	return
+end
 
--- Создаём слайдер
-local Slider = TPTab:CreateSlider({
-	Name = "Blink Speed Boost",
-	Range = {1, 50},
-	Increment = 1,
-	Suffix = "Speed",
-	CurrentValue = 5, -- начальное значение
-	Callback = function(boostValue)
-
-		-- Персонаж и модель Blink
-		character = player.Character or player.CharacterAdded:Wait()
-		local blinkModel = character:FindFirstChild("Blink") or character:WaitForChild("Blink", 10)
-		if not blinkModel then
-			warn("❌ Blink не найден")
-			return
+-- Постоянно следим за состоянием Blink
+game:GetService("RunService").RenderStepped:Connect(function()
+	local state = blinkModel:GetAttribute("State")
+	if state == 2 then -- Teleporting
+		-- Активируем ускорение
+		if not character:GetAttribute("Boosting") then
+			speedModule.addSpeed(nil, character, speedId, boostValue, math.huge)
+			character:SetAttribute("Boosting", true)
 		end
-
-		-- Если уже подключены — не повторять
-		if blinkConnectionRunning then return end
-		blinkConnectionRunning = true
-
-		-- Подключаем цикл RenderStepped для управления ускорением
-		game:GetService("RunService").RenderStepped:Connect(function()
-			local state = blinkModel:GetAttribute("State")
-			if state == 2 then -- Blink активен
-				if not character:GetAttribute("Boosting") then
-					speedModule.addSpeed(nil, character, speedId, boostValue, math.huge)
-					character:SetAttribute("Boosting", true)
-				end
-			else
-				if character:GetAttribute("Boosting") then
-					speedModule.removeSpeed(nil, character, speedId)
-					character:SetAttribute("Boosting", false)
-				end
-			end
-		end)
-	end,
-})
+	else
+		-- Убираем ускорение
+		if character:GetAttribute("Boosting") then
+			speedModule.removeSpeed(nil, character, speedId)
+			character:SetAttribute("Boosting", false)
+		end
+	end
+end)
 
 
 local Button1 = TPTab:CreateButton({
