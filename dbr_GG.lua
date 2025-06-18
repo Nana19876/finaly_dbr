@@ -1503,6 +1503,7 @@ local Button1 = TPTab:CreateButton({
 }) -- <-- закрываем CreateButton
 
 
+
 local Button1 = TPTab:CreateButton({
    Name = "fly over the killer (Z)",
    Callback = function()
