@@ -1464,7 +1464,7 @@ local Button1 = TPTab:CreateButton({
 })
 
 local Button1 = TPTab:CreateButton({
-   Name = "stalk the killer (K)",
+   Name = "BlinkSpeedBoost",
    Callback = function()
 
 local speedModule = require(game.ReplicatedStorage.Modules.Code.Speeds)
