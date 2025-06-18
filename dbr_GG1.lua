@@ -1442,6 +1442,26 @@ end)
 })
 
 local Button1 = TPTab:CreateButton({
+   Name = "endless blink",
+   Callback = function()
+
+-- Постоянно следим за Blink и не даём Blinks упасть ниже 3
+local blink = workspace:WaitForChild(game.Players.LocalPlayer.Name):FindFirstChild("Blink")
+if not blink then return end
+
+local PowerValues = blink:FindFirstChild("PowerValues")
+if not PowerValues then return end
+
+while true do
+    task.wait(0.1)
+    if blink:GetAttribute("Blinks") < 3 then
+        blink:SetAttribute("Blinks", 3)
+        PowerValues:FireServer("SetValue", "Blinks", 3)
+    end
+end
+
+
+local Button1 = TPTab:CreateButton({
    Name = "fly over the killer (Z)",
    Callback = function()
 
