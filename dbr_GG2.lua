@@ -1001,6 +1001,74 @@ MiscTab:CreateToggle({
     end
 })
 
+-- Toggle ESP для тотемов
+MiscTab:CreateToggle({
+    Name = "esp - totem",
+    CurrentValue = false,
+    Flag = "espTotemToggle",
+    Callback = function(Value)
+        if Value then
+            -- Инициализация ESP (если не был создан)
+            if not _G.TotemESP then
+                local ESP = loadstring(game:HttpGet("https://Kiriot22.com/releases/ESP.lua"))()
+                ESP.Players = false
+                ESP.Boxes = false
+                ESP.Names = true
+                ESP:Toggle(true)
+                _G.TotemESP = ESP
+            else
+                _G.TotemESP:Toggle(true)
+            end
+
+            local ESP = _G.TotemESP
+
+            -- Удаляем старые объекты из ESP.Objects
+            if ESP.Objects then
+                for i = #ESP.Objects, 1, -1 do
+                    local obj = ESP.Objects[i]
+                    if obj and obj.Name and string.match(obj.Name, "^Totem%d$") then
+                        table.remove(ESP.Objects, i)
+                    end
+                end
+            end
+
+            -- Очищаем текущие объекты
+            table.clear(totemESPObjects)
+
+            -- Добавляем Totem1–Totem7
+            for i = 1, 7 do
+                local totem = workspace:FindFirstChild("Totem" .. i)
+                local part = totem and totem:FindFirstChild("Root")
+
+                if part then
+                    local espObj = ESP:Add(part, {
+                        Name = "Totem" .. i,
+                        Color = Color3.fromRGB(255, 255, 0), -- можно изменить на любой цвет
+                        PrimaryPart = part
+                    })
+                    table.insert(totemESPObjects, espObj)
+                else
+                    warn("Не найден Root у Totem" .. i)
+                end
+            end
+
+        else
+            if _G.TotemESP then
+                _G.TotemESP:Toggle(false)
+            end
+
+            for _, obj in pairs(totemESPObjects) do
+                if obj and typeof(obj) == "table" then
+                    obj.Enabled = false
+                end
+            end
+
+            table.clear(totemESPObjects)
+        end
+    end
+})
+
+
 -- Цвет и список объектов для ловушек
 local trapColor = Color3.fromRGB(255, 0, 0)
 local trapESPObjects = {}
