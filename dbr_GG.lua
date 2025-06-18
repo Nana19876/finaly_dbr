@@ -1798,6 +1798,142 @@ AnimationTab:CreateButton({
 })
 
 AnimationTab:CreateButton({
+   Name = "animation (Bowshot)",
+   Callback = function()
+       local player = game.Players.LocalPlayer
+       local character = player.Character or player.CharacterAdded:Wait()
+       local humanoid = character:WaitForChild("Humanoid")
+
+       local anim = Instance.new("Animation")
+       anim.AnimationId = "rbxassetid://131833227843012"
+
+       local track = humanoid:LoadAnimation(anim)
+       track:Play()
+   end,
+})
+
+AnimationTab:CreateButton({
+   Name = "animation (Follow)",
+   Callback = function()
+       local player = game.Players.LocalPlayer
+       local character = player.Character or player.CharacterAdded:Wait()
+       local humanoid = character:WaitForChild("Humanoid")
+
+       local anim = Instance.new("Animation")
+       anim.AnimationId = "rbxassetid://16520472961"
+
+       local track = humanoid:LoadAnimation(anim)
+       track:Play()
+   end,
+})
+
+AnimationTab:CreateButton({
+   Name = "animation (Get em)",
+   Callback = function()
+       local player = game.Players.LocalPlayer
+       local character = player.Character or player.CharacterAdded:Wait()
+       local humanoid = character:WaitForChild("Humanoid")
+
+       local anim = Instance.new("Animation")
+       anim.AnimationId = "rbxassetid://15919624781"
+
+       local track = humanoid:LoadAnimation(anim)
+       track:Play()
+   end,
+})
+
+AnimationTab:CreateButton({
+   Name = "animation (Point)",
+   Callback = function()
+       local player = game.Players.LocalPlayer
+       local character = player.Character or player.CharacterAdded:Wait()
+       local humanoid = character:WaitForChild("Humanoid")
+
+       local anim = Instance.new("Animation")
+       anim.AnimationId = "rbxassetid://16520476888"
+
+       local track = humanoid:LoadAnimation(anim)
+       track:Play()
+   end,
+})
+
+AnimationTab:CreateButton({
+   Name = "animation (Shake it)",
+   Callback = function()
+       local player = game.Players.LocalPlayer
+       local character = player.Character or player.CharacterAdded:Wait()
+       local humanoid = character:WaitForChild("Humanoid")
+
+       local anim = Instance.new("Animation")
+       anim.AnimationId = "rbxassetid://10258272240"
+
+       local track = humanoid:LoadAnimation(anim)
+       track:Play()
+   end,
+})
+
+AnimationTab:CreateButton({
+   Name = "animation (Think)",
+   Callback = function()
+       local player = game.Players.LocalPlayer
+       local character = player.Character or player.CharacterAdded:Wait()
+       local humanoid = character:WaitForChild("Humanoid")
+
+       local anim = Instance.new("Animation")
+       anim.AnimationId = "rbxassetid://121839807114786"
+
+       local track = humanoid:LoadAnimation(anim)
+       track:Play()
+   end,
+})
+
+AnimationTab:CreateButton({
+   Name = "animation (Tournament 2nd Place)",
+   Callback = function()
+       local player = game.Players.LocalPlayer
+       local character = player.Character or player.CharacterAdded:Wait()
+       local humanoid = character:WaitForChild("Humanoid")
+
+       local anim = Instance.new("Animation")
+       anim.AnimationId = "rbxassetid://133419229272999"
+
+       local track = humanoid:LoadAnimation(anim)
+       track:Play()
+   end,
+})
+
+AnimationTab:CreateButton({
+   Name = "animation (Tournament 3rd Place)",
+   Callback = function()
+       local player = game.Players.LocalPlayer
+       local character = player.Character or player.CharacterAdded:Wait()
+       local humanoid = character:WaitForChild("Humanoid")
+
+       local anim = Instance.new("Animation")
+       anim.AnimationId = "rbxassetid://83657343152240"
+
+       local track = humanoid:LoadAnimation(anim)
+       track:Play()
+   end,
+})
+
+AnimationTab:CreateButton({
+   Name = "animation (Tournament Winners)",
+   Callback = function()
+       local player = game.Players.LocalPlayer
+       local character = player.Character or player.CharacterAdded:Wait()
+       local humanoid = character:WaitForChild("Humanoid")
+
+       local anim = Instance.new("Animation")
+       anim.AnimationId = "rbxassetid://118211011052686"
+
+       local track = humanoid:LoadAnimation(anim)
+       track:Play()
+   end,
+})
+
+
+AnimationTab:CreateButton({
     Name = "Stop All Animations",
     Callback = function()
         local Players = game:GetService("Players")
