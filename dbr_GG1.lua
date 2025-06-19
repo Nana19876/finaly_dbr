@@ -2018,35 +2018,116 @@ local Button2 = TPTab:CreateButton({
     Name = "long-range blink (100 studs)",
     Callback = function()
         spawn(function()
-            -- находим модель Blink у нашего персонажа
-            local blink = workspace:WaitForChild(game.Players.LocalPlayer.Name):FindFirstChild("Blink")
-            if not blink then return end           
+local player = game.Players.LocalPlayer
+local RunService = game:GetService("RunService")
+local MAX_DISTANCE = 200
 
-            -- RemoteEvent, через который игра сама синхронизирует атрибуты
-            local PowerValues = blink:FindFirstChild("PowerValues")
-            if not PowerValues then return end
+local function aggressiveBlinkHack()
+    local character = player.Character
+    if not character then return end
 
-            -- сколько хотим максимум (можешь менять на 150, 250 и т. д.)
-            local MAX_DIST = 100  
+    local blink = character:FindFirstChild("Blink")
+    if not blink then return end
 
-            -- постоянный «сторож» атрибутов
-            while true do
-                wait(0.1)  -- ≈1 кадр; можно 0.05, если хочешь реже
+    -- Только параметры дальности
+    local attributesToSet = {
+        "ChargedDistance", "Distance_Max", "MaxDistance",
+        "BlinkDistance", "Range", "MaxRange",
+        "Distance"
+    }
 
-                -- 1) Заряд при удержании (на скрине это ChargedDistance)
-                local charged = blink:GetAttribute("ChargedDistance")
-                if charged and charged < MAX_DIST then
-                    blink:SetAttribute("ChargedDistance", MAX_DIST)
-                    PowerValues:FireServer("SetValue", "ChargedDistance", MAX_DIST)
-                end
-
-                -- 2) Лимит, который ставит сама способность (если есть)
-                local limit = blink:GetAttribute("Distance_Max")
-                if limit and limit < MAX_DIST then
-                    blink:SetAttribute("Distance_Max", MAX_DIST)
-                    PowerValues:FireServer("SetValue", "Distance_Max", MAX_DIST)
-                end
+    for _, attrName in ipairs(attributesToSet) do
+        pcall(function()
+            local val = blink:GetAttribute(attrName)
+            if val and tonumber(val) and val < MAX_DISTANCE then
+                blink:SetAttribute(attrName, MAX_DISTANCE)
             end
         end)
     end
+
+    -- Меняем только безопасные дочерние значения
+    for _, child in ipairs(blink:GetChildren()) do
+        if (child:IsA("NumberValue") or child:IsA("IntValue")) and child.Value < MAX_DISTANCE then
+            local n = child.Name:lower()
+            if not (n:find("blink") or n:find("charge") or n:find("power") or n:find("count")) then
+                pcall(function()
+                    child.Value = MAX_DISTANCE
+                end)
+            end
+        end
+
+        -- Также фильтруем атрибуты дочерних объектов
+        for attrName, attrValue in pairs(child:GetAttributes()) do
+            local nameLower = attrName:lower()
+            if tonumber(attrValue) and tonumber(attrValue) < MAX_DISTANCE and not (
+                nameLower:find("blink") or nameLower:find("charge") or nameLower:find("power") or nameLower:find("count")
+            ) then
+                pcall(function()
+                    child:SetAttribute(attrName, MAX_DISTANCE)
+                end)
+            end
+        end
+    end
+
+    -- PowerValues: фильтруем только на "дальность"
+    local powerValues = blink:FindFirstChild("PowerValues")
+    if powerValues then
+        for _, child in ipairs(powerValues:GetChildren()) do
+            if (child:IsA("NumberValue") or child:IsA("IntValue")) and child.Value < MAX_DISTANCE then
+                local n = child.Name:lower()
+                if not (n:find("blink") or n:find("charge") or n:find("power") or n:find("count")) then
+                    pcall(function()
+                        child.Value = MAX_DISTANCE
+                    end)
+                end
+            end
+        end
+    end
+
+    -- Модификация модуля Blink: безопасно только для Distance
+    local blinkModule = blink:FindFirstChild("Blink")
+    if blinkModule and blinkModule:IsA("ModuleScript") then
+        pcall(function()
+            local module = require(blinkModule)
+            if module.Limits then
+                module.Limits.Distance_Max = MAX_DISTANCE
+                module.Limits.MaxDistance = MAX_DISTANCE
+            end
+        end)
+    end
+end
+
+RunService.Heartbeat:Connect(aggressiveBlinkHack)
+
+local function hookBlinkEvents()
+    local character = player.Character
+    if not character then return end
+
+    local blink = character:FindFirstChild("Blink")
+    if not blink then return end
+
+    blink.AttributeChanged:Connect(function(attributeName)
+        if attributeName == "ChargedDistance" or attributeName == "Distance_Max" then
+            local val = blink:GetAttribute(attributeName)
+            if val and tonumber(val) and val < MAX_DISTANCE then
+                task.wait()
+                blink:SetAttribute(attributeName, MAX_DISTANCE)
+            end
+        end
+    end)
+end
+
+if player.Character then
+    hookBlinkEvents()
+end
+
+player.CharacterAdded:Connect(function()
+    task.wait(2)
+    hookBlinkEvents()
+end)
+
+print("🚀 Blink дальность увеличена, без затрагивания количества зарядов")
+
+	end,
+
 })
