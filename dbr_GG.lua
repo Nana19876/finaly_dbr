@@ -2014,28 +2014,29 @@ local Button2 = TPTab:CreateButton({
 })
 
 local Button2 = TPTab:CreateButton({
-   Name = "BlinkDistanc3",
+   Name = "BlinkDistance",
    Callback = function()
 
-local player = game.Players.LocalPlayer
+local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
-local MAX_DISTANCE = 200
 
-local function aggressiveBlinkHack()
+local player = Players.LocalPlayer
+local MAX_DISTANCE = 120
+
+local function safeBlinkHack()
     local character = player.Character
     if not character then return end
 
     local blink = character:FindFirstChild("Blink")
     if not blink then return end
 
-    -- Только параметры дальности
-    local attributesToSet = {
+    -- Только параметры дальности (исключаем все, что связано с зарядами)
+    local distanceAttributes = {
         "ChargedDistance", "Distance_Max", "MaxDistance",
-        "BlinkDistance", "Range", "MaxRange",
-        "Distance"
+        "BlinkDistance", "Range", "MaxRange", "Distance"
     }
 
-    for _, attrName in ipairs(attributesToSet) do
+    for _, attrName in ipairs(distanceAttributes) do
         pcall(function()
             local val = blink:GetAttribute(attrName)
             if val and tonumber(val) and val < MAX_DISTANCE then
@@ -2044,59 +2045,89 @@ local function aggressiveBlinkHack()
         end)
     end
 
-    -- Меняем только безопасные дочерние значения
+    -- Более строгая фильтрация дочерних объектов
     for _, child in ipairs(blink:GetChildren()) do
-        if (child:IsA("NumberValue") or child:IsA("IntValue")) and child.Value < MAX_DISTANCE then
-            local n = child.Name:lower()
-            if not (n:find("blink") or n:find("charge") or n:find("power") or n:find("count")) then
-                pcall(function()
-                    child.Value = MAX_DISTANCE
-                end)
-            end
-        end
-
-        -- Также фильтруем атрибуты дочерних объектов
-        for attrName, attrValue in pairs(child:GetAttributes()) do
-            local nameLower = attrName:lower()
-            if tonumber(attrValue) and tonumber(attrValue) < MAX_DISTANCE and not (
-                nameLower:find("blink") or nameLower:find("charge") or nameLower:find("power") or nameLower:find("count")
-            ) then
-                pcall(function()
-                    child:SetAttribute(attrName, MAX_DISTANCE)
-                end)
-            end
-        end
-    end
-
-    -- PowerValues: фильтруем только на "дальность"
-    local powerValues = blink:FindFirstChild("PowerValues")
-    if powerValues then
-        for _, child in ipairs(powerValues:GetChildren()) do
-            if (child:IsA("NumberValue") or child:IsA("IntValue")) and child.Value < MAX_DISTANCE then
-                local n = child.Name:lower()
-                if not (n:find("blink") or n:find("charge") or n:find("power") or n:find("count")) then
+        if (child:IsA("NumberValue") or child:IsA("IntValue")) then
+            local name = child.Name:lower()
+            -- Изменяем только если это явно дальность и НЕ заряды/кулдаун/время
+            if (name:find("distance") or name:find("range")) and 
+               not (name:find("charge") or name:find("cooldown") or name:find("time") or 
+                    name:find("count") or name:find("regen") or name:find("recovery")) then
+                if child.Value < MAX_DISTANCE then
                     pcall(function()
                         child.Value = MAX_DISTANCE
                     end)
                 end
             end
         end
+
+        -- Фильтрация атрибутов дочерних объектов
+        for attrName, attrValue in pairs(child:GetAttributes()) do
+            local nameLower = attrName:lower()
+            if tonumber(attrValue) and tonumber(attrValue) < MAX_DISTANCE then
+                -- Изменяем только если это дальность
+                if (nameLower:find("distance") or nameLower:find("range")) and
+                   not (nameLower:find("charge") or nameLower:find("cooldown") or 
+                        nameLower:find("time") or nameLower:find("count") or 
+                        nameLower:find("regen") or nameLower:find("recovery")) then
+                    pcall(function()
+                        child:SetAttribute(attrName, MAX_DISTANCE)
+                    end)
+                end
+            end
+        end
     end
 
-    -- Модификация модуля Blink: безопасно только для Distance
+    -- PowerValues: только дальность
+    local powerValues = blink:FindFirstChild("PowerValues")
+    if powerValues then
+        for _, child in ipairs(powerValues:GetChildren()) do
+            if (child:IsA("NumberValue") or child:IsA("IntValue")) then
+                local name = child.Name:lower()
+                if (name:find("distance") or name:find("range")) and 
+                   not (name:find("charge") or name:find("cooldown") or name:find("time") or 
+                        name:find("count") or name:find("regen") or name:find("recovery")) then
+                    if child.Value < MAX_DISTANCE then
+                        pcall(function()
+                            child.Value = MAX_DISTANCE
+                        end)
+                    end
+                end
+            end
+        end
+    end
+
+    -- Модификация модуля: только дальность
     local blinkModule = blink:FindFirstChild("Blink")
     if blinkModule and blinkModule:IsA("ModuleScript") then
         pcall(function()
             local module = require(blinkModule)
             if module.Limits then
-                module.Limits.Distance_Max = MAX_DISTANCE
-                module.Limits.MaxDistance = MAX_DISTANCE
+                -- Изменяем только дальность, НЕ трогаем заряды/кулдауны
+                if module.Limits.Distance_Max then
+                    module.Limits.Distance_Max = MAX_DISTANCE
+                end
+                if module.Limits.MaxDistance then
+                    module.Limits.MaxDistance = MAX_DISTANCE
+                end
+                if module.Limits.Range then
+                    module.Limits.Range = MAX_DISTANCE
+                end
+                -- НЕ трогаем: MaxCharges, ChargeTime, CooldownTime, RegenTime и т.д.
             end
         end)
     end
 end
 
-RunService.Heartbeat:Connect(aggressiveBlinkHack)
+-- Запускаем реже, чтобы не мешать системе восстановления
+local lastUpdate = 0
+RunService.Heartbeat:Connect(function()
+    local now = tick()
+    if now - lastUpdate > 0.5 then -- Обновляем каждые 0.5 секунд
+        lastUpdate = now
+        safeBlinkHack()
+    end
+end)
 
 local function hookBlinkEvents()
     local character = player.Character
@@ -2105,11 +2136,15 @@ local function hookBlinkEvents()
     local blink = character:FindFirstChild("Blink")
     if not blink then return end
 
+    -- Отслеживаем только изменения дальности
     blink.AttributeChanged:Connect(function(attributeName)
-        if attributeName == "ChargedDistance" or attributeName == "Distance_Max" then
+        local name = attributeName:lower()
+        if (name:find("distance") or name:find("range")) and 
+           not (name:find("charge") or name:find("cooldown") or name:find("time") or 
+                name:find("count") or name:find("regen") or name:find("recovery")) then
             local val = blink:GetAttribute(attributeName)
             if val and tonumber(val) and val < MAX_DISTANCE then
-                task.wait()
+                task.wait(0.1) -- Небольшая задержка
                 blink:SetAttribute(attributeName, MAX_DISTANCE)
             end
         end
@@ -2121,11 +2156,11 @@ if player.Character then
 end
 
 player.CharacterAdded:Connect(function()
-    task.wait(2)
+    task.wait(3) -- Увеличиваем задержку для полной загрузки
     hookBlinkEvents()
 end)
 
-print("🚀 Blink дальность увеличена, без затрагивания количества зарядов")
+print("🚀 Blink дальность увеличена, заряды должны восстанавливаться нормально")
 
 	end,
 
