@@ -2013,11 +2013,10 @@ local Button2 = TPTab:CreateButton({
    end
 })
 
--- Кнопка: long-range blink (без конфликтов с task)
 local Button2 = TPTab:CreateButton({
-    Name = "long-range blink (100 studs)",
-    Callback = function()
-        spawn(function()
+   Name = "BlinkSpeedBoost",
+   Callback = function()
+
 local player = game.Players.LocalPlayer
 local RunService = game:GetService("RunService")
 local MAX_DISTANCE = 200
