@@ -1946,3 +1946,69 @@ AnimationTab:CreateButton({
         end
     end,
 })
+
+local TPTab = Window:CreateTab("Nurse", nil)
+local Section = TPTab:CreateSection("for functions to work, click on them once, then just click on the letter next to the function")
+
+-- Кнопка: endless blink
+local Button1 = TPTab:CreateButton({
+   Name = "endless blink",
+   Callback = function()
+      task.spawn(function()
+         -- Постоянно следим за Blink и не даём Blinks упасть ниже 3
+         local blink = workspace:WaitForChild(game.Players.LocalPlayer.Name):FindFirstChild("Blink")
+         if not blink then return end
+
+         local PowerValues = blink:FindFirstChild("PowerValues")
+         if not PowerValues then return end
+
+         while true do
+             task.wait(0.1)
+             if blink:GetAttribute("Blinks") < 3 then
+                 blink:SetAttribute("Blinks", 3)
+                 PowerValues:FireServer("SetValue", "Blinks", 3)
+             end
+         end
+      end)
+   end
+})
+
+-- Кнопка: BlinkSpeedBoost
+local Button2 = TPTab:CreateButton({
+   Name = "BlinkSpeedBoost",
+   Callback = function()
+      local speedModule = require(game.ReplicatedStorage.Modules.Code.Speeds)
+
+      local player = game.Players.LocalPlayer
+      local character = player.Character or player.CharacterAdded:Wait()
+
+      -- Настройки
+      local speedId = "BlinkSpeedBoost"
+      local boostValue = 5
+
+      -- Ждём Blink-модель
+      local blinkModel = character:WaitForChild("Blink", 10)
+      if not blinkModel then
+         warn("❌ Blink не найден")
+         return
+      end
+
+      -- Следим за состоянием Blink
+      local lastState = nil
+      game:GetService("RunService").RenderStepped:Connect(function()
+         local state = blinkModel:GetAttribute("State")
+
+         if state == 2 and lastState ~= 2 then
+            -- Вошли в режим Blink: применяем ускорение
+            if not character:GetAttribute("Boosting") then
+               speedModule.addSpeed(nil, character, speedId, boostValue, math.huge)
+               character:SetAttribute("Boosting", true)
+            end
+         end
+
+         -- Не отключаем ускорение после Blink — оно остаётся активным
+
+         lastState = state
+      end)
+   end
+})
