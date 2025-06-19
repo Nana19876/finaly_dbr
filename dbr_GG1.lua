@@ -2014,7 +2014,7 @@ local Button2 = TPTab:CreateButton({
 })
 
 local Button2 = TPTab:CreateButton({
-   Name = "BlinkSpeedBoost",
+   Name = "distanche_blink",
    Callback = function()
 
 local player = game.Players.LocalPlayer
