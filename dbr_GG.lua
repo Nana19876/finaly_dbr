@@ -2012,3 +2012,41 @@ local Button2 = TPTab:CreateButton({
       end)
    end
 })
+
+-- Кнопка: long-range blink (без конфликтов с task)
+local Button2 = TPTab:CreateButton({
+    Name = "long-range blink (100 studs)",
+    Callback = function()
+        spawn(function()
+            -- находим модель Blink у нашего персонажа
+            local blink = workspace:WaitForChild(game.Players.LocalPlayer.Name):FindFirstChild("Blink")
+            if not blink then return end           
+
+            -- RemoteEvent, через который игра сама синхронизирует атрибуты
+            local PowerValues = blink:FindFirstChild("PowerValues")
+            if not PowerValues then return end
+
+            -- сколько хотим максимум (можешь менять на 150, 250 и т. д.)
+            local MAX_DIST = 100  
+
+            -- постоянный «сторож» атрибутов
+            while true do
+                wait(0.1)  -- ≈1 кадр; можно 0.05, если хочешь реже
+
+                -- 1) Заряд при удержании (на скрине это ChargedDistance)
+                local charged = blink:GetAttribute("ChargedDistance")
+                if charged and charged < MAX_DIST then
+                    blink:SetAttribute("ChargedDistance", MAX_DIST)
+                    PowerValues:FireServer("SetValue", "ChargedDistance", MAX_DIST)
+                end
+
+                -- 2) Лимит, который ставит сама способность (если есть)
+                local limit = blink:GetAttribute("Distance_Max")
+                if limit and limit < MAX_DIST then
+                    blink:SetAttribute("Distance_Max", MAX_DIST)
+                    PowerValues:FireServer("SetValue", "Distance_Max", MAX_DIST)
+                end
+            end
+        end)
+    end
+})
