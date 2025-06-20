@@ -2165,3 +2165,15 @@ print("🚀 Blink дальность увеличена, заряды должн
 	end,
 
 })
+
+local TPTab = Window:CreateTab("Hunteres", nil)
+local Section = TPTab:CreateSection("for functions to work, click on them once, then just click on the letter next to the function")
+
+
+local Button2 = TPTab:CreateButton({
+   Name = "EndlessHatches",
+   Callback = function()
+
+	end,
+
+})
