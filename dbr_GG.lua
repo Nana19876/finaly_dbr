@@ -1442,69 +1442,88 @@ end)
 })
 
 local Button1 = TPTab:CreateButton({
-   Name = "endless blink",
-   Callback = function()
-      task.spawn(function()
-         -- Постоянно следим за Blink и не даём Blinks упасть ниже 3
-         local blink = workspace:WaitForChild(game.Players.LocalPlayer.Name):FindFirstChild("Blink")
-         if not blink then return end
-
-         local PowerValues = blink:FindFirstChild("PowerValues")
-         if not PowerValues then return end
-
-         while true do
-             task.wait(0.1)
-             if blink:GetAttribute("Blinks") < 3 then
-                 blink:SetAttribute("Blinks", 3)
-                 PowerValues:FireServer("SetValue", "Blinks", 3)
-             end
-         end
-      end)
-   end
-})
-
-local Button1 = TPTab:CreateButton({
-   Name = "BlinkSpeedBoost",
+   Name = "stalk the killer (K)",
    Callback = function()
 
-local speedModule = require(game.ReplicatedStorage.Modules.Code.Speeds)
-
+-- Автоматическое попадание в "Great" зону скилл-чеков
 local player = game.Players.LocalPlayer
-local character = player.Character or player.CharacterAdded:Wait()
+local playerGui = player:WaitForChild("PlayerGui")
 
--- Настройки
-local speedId = "BlinkSpeedBoost"
-local boostValue = 5
-
--- Ждём Blink-модель
-local blinkModel = character:WaitForChild("Blink", 10)
-if not blinkModel then
-	warn("❌ Blink не найден")
-	return
+-- Функция для поиска активного скилл-чека
+local function findActiveSkillCheck()
+    local hud = playerGui:FindFirstChild("HUD")
+    if hud then
+        local skillCheck = hud:FindFirstChild("SkillCheck")
+        if skillCheck and skillCheck.Visible then
+            return skillCheck
+        end
+    end
+    return nil
 end
 
--- Следим за состоянием Blink
-local lastState = nil
-game:GetService("RunService").RenderStepped:Connect(function()
-	local state = blinkModel:GetAttribute("State")
+-- Функция для автоматического попадания в Great зону
+local function autoHitGreat()
+    local skillCheck = findActiveSkillCheck()
+    if not skillCheck then return end
+    
+    local needle = skillCheck:FindFirstChild("Needle")
+    if not needle then return end
+    
+    -- Ищем зону Great
+    local greatZone = skillCheck:FindFirstChild("GREAT")
+    if not greatZone then return end
+    
+    -- Получаем границы Great зоны из первого и последнего элемента
+    local greatChildren = greatZone:GetChildren()
+    if #greatChildren == 0 then return end
+    
+    -- Вычисляем центр Great зоны
+    local firstRotation = greatChildren[1].Rotation
+    local lastRotation = greatChildren[#greatChildren].Rotation
+    local centerRotation = (firstRotation + lastRotation) / 2
+    
+    -- Ждем пока стрелка приблизится к центру Great зоны
+    local currentRotation = needle.Rotation
+    local targetRotation = centerRotation
+    
+    -- Вычисляем когда нужно "нажать"
+    local rotationSpeed = 240 -- Стандартная скорость из кода
+    local timeDifference = math.abs(targetRotation - currentRotation) / rotationSpeed
+    
+    -- Небольшая задержка для точности
+    task.wait(math.max(0, timeDifference - 0.05))
+    
+    -- Имитируем нажатие клавиши (обычно Space)
+    local UserInputService = game:GetService("UserInputService")
+    local VirtualInputManager = game:GetService("VirtualInputManager")
+    
+    -- Отправляем нажатие Space
+    VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Space, false, game)
+    task.wait(0.01)
+    VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Space, false, game)
+    
+    print("Auto-hit Great zone!")
+end
 
-	if state == 2 and lastState ~= 2 then
-		-- Вошли в режим Blink: применяем ускорение
-		if not character:GetAttribute("Boosting") then
-			speedModule.addSpeed(nil, character, speedId, boostValue, math.huge)
-			character:SetAttribute("Boosting", true)
-		end
-	end
-
-	-- Не отключаем ускорение после Blink — оно остаётся активным
-
-	lastState = state
+-- Мониторинг появления скилл-чеков
+spawn(function()
+    while true do
+        task.wait(0.1)
+        
+        local skillCheck = findActiveSkillCheck()
+        if skillCheck then
+            -- Ждем небольшую задержку после появления
+            task.wait(0.2)
+            autoHitGreat()
+        end
+    end
 end)
+
+print("Auto Great skill check activated!")
 
 	end,
 
 })
-
 local Button1 = TPTab:CreateButton({
    Name = "fly over the killer (Z)",
    Callback = function()
