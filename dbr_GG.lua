@@ -1293,14 +1293,14 @@ local DeadHardToggle = TPTab:CreateToggle({
 
 
 local Slider = TPTab:CreateSlider({
-   Name = "WalkSpeed Slide (Z)",
+   Name = "WalkSpeed Slide (X)",
    Range = {1, 350},
    Increment = 1,
    Suffix = "Speed",
    CurrentValue = 16,
    Callback = function(Value)
 
--- Очень тонкая настройка скорости для CFrame
+-- Очень тонкая настройка скорости для CFrame на клавишу X
 local function getFineTunedSpeed(sliderValue)
     -- Гораздо меньшие значения для более точного контроля
     if sliderValue <= 16 then
@@ -1336,10 +1336,10 @@ local isSpeedBoosted = false
 local speedConnection = nil
 
 -- Создание/обновление GUI
-local screenGui = player.PlayerGui:FindFirstChild("ZCFrameBoostGUI")
+local screenGui = player.PlayerGui:FindFirstChild("XCFrameBoostGUI")
 if not screenGui then
     screenGui = Instance.new("ScreenGui")
-    screenGui.Name = "ZCFrameBoostGUI"
+    screenGui.Name = "XCFrameBoostGUI"
     screenGui.Parent = player.PlayerGui
 
     local frame = Instance.new("Frame")
@@ -1359,7 +1359,7 @@ if not screenGui then
     titleLabel.Size = UDim2.new(1, 0, 0.4, 0)
     titleLabel.Position = UDim2.new(0, 0, 0, 0)
     titleLabel.BackgroundTransparency = 1
-    titleLabel.Text = "Fine-Tuned CFrame Speed"
+    titleLabel.Text = "X Key CFrame Speed"
     titleLabel.TextColor3 = Color3.new(1, 1, 1)
     titleLabel.TextScaled = true
     titleLabel.Font = Enum.Font.SourceSansBold
@@ -1381,7 +1381,7 @@ if not screenGui then
     statusLabel.Size = UDim2.new(1, 0, 0.3, 0)
     statusLabel.Position = UDim2.new(0, 0, 0.7, 0)
     statusLabel.BackgroundTransparency = 1
-    statusLabel.Text = "Hold Z to boost"
+    statusLabel.Text = "Hold X to boost"
     statusLabel.TextColor3 = Color3.new(0.8, 0.8, 0.8)
     statusLabel.TextScaled = true
     statusLabel.Font = Enum.Font.SourceSans
@@ -1397,11 +1397,11 @@ speedLabel.Text = "Slider: " .. Value .. " → Speed: " .. string.format("%.4f",
 
 local function updateStatus()
     if isSpeedBoosted then
-        statusLabel.Text = "🚀 Z BOOSTING! (Very Fine Control)"
+        statusLabel.Text = "🚀 X BOOSTING! (Fine Control)"
         statusLabel.TextColor3 = Color3.new(0, 1, 0)
         frame.BackgroundColor3 = Color3.new(0, 0.2, 0)
     else
-        statusLabel.Text = "Hold Z to boost (Fine-Tuned)"
+        statusLabel.Text = "Hold X to boost"
         statusLabel.TextColor3 = Color3.new(0.8, 0.8, 0.8)
         frame.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1)
     end
@@ -1435,30 +1435,30 @@ local function disableSpeedBoost()
     end
 end
 
--- Управление подключениями
-if _G.ZSpeedConnections then
-    for _, conn in pairs(_G.ZSpeedConnections) do
+-- Управление подключениями (изменено на X)
+if _G.XSpeedConnections then
+    for _, conn in pairs(_G.XSpeedConnections) do
         conn:Disconnect()
     end
 end
 
-_G.ZSpeedConnections = {
+_G.XSpeedConnections = {
     UserInputService.InputBegan:Connect(function(input, gameProcessed)
         if gameProcessed then return end
-        if input.KeyCode == Enum.KeyCode.Z then
+        if input.KeyCode == Enum.KeyCode.X then  -- Изменено на X
             enableSpeedBoost()
         end
     end),
     
     UserInputService.InputEnded:Connect(function(input, gameProcessed)
-        if input.KeyCode == Enum.KeyCode.Z then
+        if input.KeyCode == Enum.KeyCode.X then  -- Изменено на X
             disableSpeedBoost()
         end
     end)
 }
 
 updateStatus()
-print("🏃 Fine-Tuned Speed: Slider " .. Value .. " → CFrame " .. string.format("%.4f", boostSpeed))
+print("🏃 X Key Speed: Slider " .. Value .. " → CFrame " .. string.format("%.4f", boostSpeed))
 
    end,
 })
