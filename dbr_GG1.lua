@@ -1299,8 +1299,25 @@ local Slider = TPTab:CreateSlider({
    Suffix = "Speed",
    CurrentValue = 16,
    Callback = function(Value)
-			
--- Z ускорение через CFrame с GUI (исправленная версия)
+
+-- Очень тонкая настройка скорости для CFrame
+local function getFineTunedSpeed(sliderValue)
+    -- Гораздо меньшие значения для более точного контроля
+    if sliderValue <= 16 then
+        -- Для стандартных значений: 1-16 -> 0.005-0.08
+        return sliderValue * 0.005
+    elseif sliderValue <= 50 then
+        -- Для средних значений: 17-50 -> 0.08-0.15
+        return 0.08 + (sliderValue - 16) * 0.002
+    elseif sliderValue <= 100 then
+        -- Для высоких значений: 51-100 -> 0.15-0.25
+        return 0.15 + (sliderValue - 50) * 0.002
+    else
+        -- Для очень высоких значений: 101-350 -> 0.25-0.5
+        return 0.25 + (sliderValue - 100) * 0.001
+    end
+end
+
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
@@ -1314,17 +1331,11 @@ player.CharacterAdded:Connect(function(c)
     hrp = c:WaitForChild("HumanoidRootPart")
 end)
 
--- НАСТРОЙКИ - преобразуем значение слайдера в подходящую скорость для CFrame
-local function calculateBoostSpeed(sliderValue)
-    -- Преобразуем 1-350 в 0.02-2.0 (более разумный диапазон для CFrame)
-    return math.max(0.02, sliderValue * 0.006) -- Формула: Value * 0.006
-end
-
-local boostSpeed = calculateBoostSpeed(Value)
+local boostSpeed = getFineTunedSpeed(Value)
 local isSpeedBoosted = false
 local speedConnection = nil
 
--- Создание GUI (только если еще не создан)
+-- Создание/обновление GUI
 local screenGui = player.PlayerGui:FindFirstChild("ZCFrameBoostGUI")
 if not screenGui then
     screenGui = Instance.new("ScreenGui")
@@ -1332,7 +1343,7 @@ if not screenGui then
     screenGui.Parent = player.PlayerGui
 
     local frame = Instance.new("Frame")
-    frame.Size = UDim2.new(0, 250, 0, 70)
+    frame.Size = UDim2.new(0, 300, 0, 80)
     frame.Position = UDim2.new(0, 10, 0, 10)
     frame.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1)
     frame.BackgroundTransparency = 0.2
@@ -1345,19 +1356,30 @@ if not screenGui then
 
     local titleLabel = Instance.new("TextLabel")
     titleLabel.Name = "TitleLabel"
-    titleLabel.Size = UDim2.new(1, 0, 0.5, 0)
+    titleLabel.Size = UDim2.new(1, 0, 0.4, 0)
     titleLabel.Position = UDim2.new(0, 0, 0, 0)
     titleLabel.BackgroundTransparency = 1
-    titleLabel.Text = "CFrame Speed Boost"
+    titleLabel.Text = "Fine-Tuned CFrame Speed"
     titleLabel.TextColor3 = Color3.new(1, 1, 1)
     titleLabel.TextScaled = true
     titleLabel.Font = Enum.Font.SourceSansBold
     titleLabel.Parent = frame
 
+    local speedLabel = Instance.new("TextLabel")
+    speedLabel.Name = "SpeedLabel"
+    speedLabel.Size = UDim2.new(1, 0, 0.3, 0)
+    speedLabel.Position = UDim2.new(0, 0, 0.4, 0)
+    speedLabel.BackgroundTransparency = 1
+    speedLabel.Text = "Slider: " .. Value .. " → Speed: " .. string.format("%.4f", boostSpeed)
+    speedLabel.TextColor3 = Color3.new(0.9, 0.9, 0.9)
+    speedLabel.TextScaled = true
+    speedLabel.Font = Enum.Font.SourceSans
+    speedLabel.Parent = frame
+
     local statusLabel = Instance.new("TextLabel")
     statusLabel.Name = "StatusLabel"
-    statusLabel.Size = UDim2.new(1, 0, 0.5, 0)
-    statusLabel.Position = UDim2.new(0, 0, 0.5, 0)
+    statusLabel.Size = UDim2.new(1, 0, 0.3, 0)
+    statusLabel.Position = UDim2.new(0, 0, 0.7, 0)
     statusLabel.BackgroundTransparency = 1
     statusLabel.Text = "Hold Z to boost"
     statusLabel.TextColor3 = Color3.new(0.8, 0.8, 0.8)
@@ -1366,30 +1388,30 @@ if not screenGui then
     statusLabel.Parent = frame
 end
 
--- Обновляем GUI с новыми значениями
+-- Обновление GUI
 local frame = screenGui:FindFirstChild("Frame")
+local speedLabel = frame:FindFirstChild("SpeedLabel")
 local statusLabel = frame:FindFirstChild("StatusLabel")
 
-local function updateGUI()
-    if statusLabel then
-        if isSpeedBoosted then
-            statusLabel.Text = "🚀 Z BOOSTING! (Slider: " .. Value .. ", CFrame: " .. string.format("%.3f", boostSpeed) .. ")"
-            statusLabel.TextColor3 = Color3.new(0, 1, 0)
-            frame.BackgroundColor3 = Color3.new(0, 0.2, 0)
-        else
-            statusLabel.Text = "Hold Z to boost (Slider: " .. Value .. ", CFrame: " .. string.format("%.3f", boostSpeed) .. ")"
-            statusLabel.TextColor3 = Color3.new(0.8, 0.8, 0.8)
-            frame.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1)
-        end
+speedLabel.Text = "Slider: " .. Value .. " → Speed: " .. string.format("%.4f", boostSpeed)
+
+local function updateStatus()
+    if isSpeedBoosted then
+        statusLabel.Text = "🚀 Z BOOSTING! (Very Fine Control)"
+        statusLabel.TextColor3 = Color3.new(0, 1, 0)
+        frame.BackgroundColor3 = Color3.new(0, 0.2, 0)
+    else
+        statusLabel.Text = "Hold Z to boost (Fine-Tuned)"
+        statusLabel.TextColor3 = Color3.new(0.8, 0.8, 0.8)
+        frame.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1)
     end
 end
 
 -- Функции управления
 local function enableSpeedBoost()
     if isSpeedBoosted then return end
-    
     isSpeedBoosted = true
-    updateGUI()
+    updateStatus()
     
     speedConnection = RunService.RenderStepped:Connect(function()
         if isSpeedBoosted and hrp and hrp.Parent then
@@ -1404,9 +1426,8 @@ end
 
 local function disableSpeedBoost()
     if not isSpeedBoosted then return end
-    
     isSpeedBoosted = false
-    updateGUI()
+    updateStatus()
     
     if speedConnection then
         speedConnection:Disconnect()
@@ -1414,36 +1435,32 @@ local function disableSpeedBoost()
     end
 end
 
--- Отключаем предыдущие подключения если есть
-if _G.ZSpeedInputConnections then
-    for _, connection in pairs(_G.ZSpeedInputConnections) do
-        connection:Disconnect()
+-- Управление подключениями
+if _G.ZSpeedConnections then
+    for _, conn in pairs(_G.ZSpeedConnections) do
+        conn:Disconnect()
     end
 end
 
--- Создаем новые подключения
-_G.ZSpeedInputConnections = {}
-
-_G.ZSpeedInputConnections[1] = UserInputService.InputBegan:Connect(function(input, gameProcessed)
-    if gameProcessed then return end
+_G.ZSpeedConnections = {
+    UserInputService.InputBegan:Connect(function(input, gameProcessed)
+        if gameProcessed then return end
+        if input.KeyCode == Enum.KeyCode.Z then
+            enableSpeedBoost()
+        end
+    end),
     
-    if input.KeyCode == Enum.KeyCode.Z then
-        enableSpeedBoost()
-    end
-end)
+    UserInputService.InputEnded:Connect(function(input, gameProcessed)
+        if input.KeyCode == Enum.KeyCode.Z then
+            disableSpeedBoost()
+        end
+    end)
+}
 
-_G.ZSpeedInputConnections[2] = UserInputService.InputEnded:Connect(function(input, gameProcessed)
-    if input.KeyCode == Enum.KeyCode.Z then
-        disableSpeedBoost()
-    end
-end)
+updateStatus()
+print("🏃 Fine-Tuned Speed: Slider " .. Value .. " → CFrame " .. string.format("%.4f", boostSpeed))
 
--- Обновляем GUI при первом запуске
-updateGUI()
-
-print("🏃 Z CFrame Boost updated! Slider: " .. Value .. ", CFrame Speed: " .. string.format("%.3f", boostSpeed))
-
-	end,
+   end,
 })
 
 local JumpToggle = TPTab:CreateToggle({
