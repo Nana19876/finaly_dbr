@@ -2632,3 +2632,60 @@ print("✅ Скрипт завершен")
 	end,
 
 })
+
+local Button2 = TPTab:CreateButton({
+   Name = "NOwindowVaultSpeed",
+   Callback = function()
+
+-- Скрипт для изменения WindowVaultSpeed
+local Players = game:GetService("Players")
+
+-- Настройки (измени на нужные значения)
+local NEW_WINDOW_VAULT_SPEED = 0.1    -- Новая скорость (0.1 → 5 = в 50 раз быстрее!)
+
+print("🪟 Изменение скорости прыжков через окна...")
+
+-- Функция поиска и изменения Movement конфигурации
+local function modifyWindowVaultSpeed()
+    local modified = false
+    
+    -- Поиск в Players
+    for _, player in pairs(Players:GetPlayers()) do
+        local movementConfig = player:FindFirstChild("Movement")
+        if movementConfig and movementConfig:IsA("Configuration") then
+            local oldSpeed = movementConfig:GetAttribute("WindowVaultSpeed")
+            if oldSpeed then
+                movementConfig:SetAttribute("WindowVaultSpeed", NEW_WINDOW_VAULT_SPEED)
+                print("✅ " .. player.Name .. " WindowVaultSpeed: " .. tostring(oldSpeed) .. " → " .. tostring(NEW_WINDOW_VAULT_SPEED))
+                modified = true
+            end
+        end
+    end
+    
+    -- Дополнительный поиск по всей игре
+    for _, obj in pairs(game:GetDescendants()) do
+        if obj.Name == "Movement" and obj:IsA("Configuration") then
+            local oldSpeed = obj:GetAttribute("WindowVaultSpeed")
+            if oldSpeed then
+                obj:SetAttribute("WindowVaultSpeed", NEW_WINDOW_VAULT_SPEED)
+                print("✅ " .. obj:GetFullName() .. " WindowVaultSpeed изменен!")
+                modified = true
+            end
+        end
+    end
+    
+    return modified
+end
+
+-- Выполняем изменения
+if modifyWindowVaultSpeed() then
+    print("🎉 WindowVaultSpeed успешно изменен на " .. NEW_WINDOW_VAULT_SPEED .. "!")
+else
+    print("❌ Movement конфигурация не найдена")
+end
+
+print("✅ Скрипт завершен")
+
+	end,
+
+})
