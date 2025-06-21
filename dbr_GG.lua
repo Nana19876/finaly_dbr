@@ -1524,6 +1524,152 @@ print("Auto Great skill check activated!")
 	end,
 
 })
+
+local Button1 = TPTab:CreateButton({
+   Name = "avto-SkillCheck (GREAT)",
+   Callback = function()
+
+-- Автоматическое попадание в "Good" зону скилл-чеков
+local player = game.Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+local runService = game:GetService("RunService")
+
+local autoSkillCheckActive = false
+
+-- Основная функция автоскилл-чеков для Good зоны
+local function startAutoGoodSkillCheck()
+    if autoSkillCheckActive then return end
+    autoSkillCheckActive = true
+    
+    print("🎯 AUTO GOOD SKILL CHECK ACTIVATED!")
+    
+    local connection = nil
+    
+    local function handleSkillCheck(skillCheck)
+        local needle = skillCheck:FindFirstChild("Needle")
+        local goodZone = skillCheck:FindFirstChild("GOOD")  -- Ищем GOOD зону вместо GREAT
+        
+        if not needle or not goodZone then return end
+        
+        local goodChildren = goodZone:GetChildren()
+        if #goodChildren == 0 then return end
+        
+        -- Вычисляем границы Good зоны
+        local startRotation = goodChildren[1].Rotation
+        local endRotation = goodChildren[#goodChildren].Rotation
+        
+        -- Целимся в начало Good зоны (более естественно)
+        local targetRotation = startRotation + (endRotation - startRotation) * 0.3
+        
+        print("Good zone: " .. startRotation .. " to " .. endRotation)
+        print("Target Good position: " .. targetRotation)
+        
+        if connection then connection:Disconnect() end
+        
+        connection = runService.Heartbeat:Connect(function()
+            if not skillCheck.Visible then
+                connection:Disconnect()
+                return
+            end
+            
+            local currentRotation = needle.Rotation
+            
+            -- Проверяем если стрелка приближается к целевой позиции в Good зоне
+            if math.abs(currentRotation - targetRotation) < 6 then
+                local VirtualInputManager = game:GetService("VirtualInputManager")
+                VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Space, false, game)
+                task.wait(0.01)
+                VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Space, false, game)
+                
+                print("✅ Good hit at rotation: " .. currentRotation)
+                connection:Disconnect()
+            end
+        end)
+    end
+    
+    -- Мониторинг скилл-чеков
+    spawn(function()
+        while autoSkillCheckActive do
+            task.wait(0.1)
+            
+            local hud = playerGui:FindFirstChild("HUD")
+            if hud then
+                local skillCheck = hud:FindFirstChild("SkillCheck")
+                if skillCheck and skillCheck.Visible then
+                    task.wait(0.2)
+                    handleSkillCheck(skillCheck)
+                    
+                    -- Ждем пока скилл-чек исчезнет
+                    repeat task.wait(0.1) until not skillCheck.Visible
+                end
+            end
+        end
+    end)
+end
+
+-- Проверка готовности системы
+local function isSystemReady()
+    return player.Character and 
+           playerGui:FindFirstChild("HUD") and
+           player.Character:FindFirstChild("HumanoidRootPart")
+end
+
+-- Автоматическая активация
+local function autoActivate()
+    print("🔍 Checking system readiness for Good skill checks...")
+    
+    if isSystemReady() then
+        print("✅ System ready!")
+        task.wait(1)
+        startAutoGoodSkillCheck()
+    else
+        print("⏳ Waiting for system to be ready...")
+        
+        repeat
+            task.wait(1)
+        until isSystemReady()
+        
+        print("✅ System now ready!")
+        task.wait(2)
+        startAutoGoodSkillCheck()
+    end
+end
+
+-- Запуск при загрузке персонажа
+player.CharacterAdded:Connect(function()
+    autoSkillCheckActive = false
+    task.wait(3)
+    autoActivate()
+end)
+
+-- Запуск если персонаж уже есть
+if player.Character then
+    task.wait(1)
+    autoActivate()
+end
+
+-- Ручная активация по клавише F2
+local UserInputService = game:GetService("UserInputService")
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end
+    
+    if input.KeyCode == Enum.KeyCode.F2 then
+        if not autoSkillCheckActive then
+            startAutoGoodSkillCheck()
+            print("🎯 Manual Good skill check activation!")
+        else
+            print("⚠️ Auto Good skill check already active!")
+        end
+    end
+end)
+
+print("🚀 Auto GOOD Skill Check System Loaded!")
+print("Will activate automatically when ready, or press F2 to activate manually")
+
+	end,
+
+})
+			
 local Button1 = TPTab:CreateButton({
    Name = "fly over the killer (Z)",
    Callback = function()
