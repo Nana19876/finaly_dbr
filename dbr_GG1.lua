@@ -1407,6 +1407,10 @@ end)
 
 print("🏃 Z CFrame Boost with GUI loaded!")
 
+	end,
+
+})
+
 local JumpToggle = TPTab:CreateToggle({
 	Name = "Jump (Space)",
 	CurrentValue = false,
