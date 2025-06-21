@@ -1442,7 +1442,7 @@ end)
 })
 
 local Button1 = TPTab:CreateButton({
-   Name = "avto-SkillCheck",
+   Name = "avto-SkillCheck (GREAT)",
    Callback = function()
 
 -- Автоматическое попадание в "Great" зону скилл-чеков
@@ -1526,7 +1526,7 @@ print("Auto Great skill check activated!")
 })
 
 local Button1 = TPTab:CreateButton({
-   Name = "avto-SkillCheck (GREAT)",
+   Name = "avto-SkillCheck (GOOD)",
    Callback = function()
 
 -- Автоматическое попадание в "Good" зону скилл-чеков
