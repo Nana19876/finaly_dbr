@@ -1442,7 +1442,7 @@ end)
 })
 
 local Button1 = TPTab:CreateButton({
-   Name = "stalk the killer (K)",
+   Name = "avto-SkillCheck",
    Callback = function()
 
 -- Автоматическое попадание в "Great" зону скилл-чеков
