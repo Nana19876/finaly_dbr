@@ -2357,9 +2357,9 @@ print("🚀 Blink дальность увеличена, заряды должн
 
 })
 
+-- Создание вкладки и секции
 local TPTab = Window:CreateTab("defolt", nil)
 local Section = TPTab:CreateSection("for functions to work, click on them once, then just click on the letter next to the function")
-
 
 -- GUI для настройки параметров Action и Movement
 local Players = game:GetService("Players")
@@ -2418,7 +2418,3 @@ for _, param in ipairs(PARAMETERS) do
 end
 
 print("🎛️ Интерфейс управления скоростями успешно создан")
-
-	end,
-
-})
