@@ -2357,62 +2357,309 @@ print("🚀 Blink дальность увеличена, заряды должн
 
 })
 
--- Создание вкладки и секции
 local TPTab = Window:CreateTab("defolt", nil)
 local Section = TPTab:CreateSection("for functions to work, click on them once, then just click on the letter next to the function")
 
--- GUI для настройки параметров Action и Movement
+
 local Players = game:GetService("Players")
 
--- Список настраиваемых атрибутов
-local PARAMETERS = {
-	{ name = "MissCooldown", label = "Кулдаун промаха" },
-	{ name = "PalletBreakSpeed", label = "Скорость разрушения поддона" },
-	{ name = "WallBreakSpeed", label = "Скорость разрушения стены" },
-	{ name = "WipeSpeed", label = "Скорость вытирания оружия" },
-	{ name = "WindowVaultSpeed", label = "Скорость прыжка через окно", configName = "Movement" },
+-- Добавляем ползунок
+local Slider = TPTab:CreateSlider({
+	Name = "Настройка MissCooldown",
+	Range = {0.1, 10}, -- Минимум и максимум
+	Increment = 0.1,   -- Шаг изменения
+	Suffix = "сек",    -- Показывает единицу
+	CurrentValue = 1,  -- Значение по умолчанию
+	Flag = "MissCooldownSlider", 
+	Callback = function(value)
+		print("🔧 Установка MissCooldown:", value)
+
+		local function modifyMissCooldown()
+			local modified = false
+
+			for _, player in pairs(Players:GetPlayers()) do
+				local config = player:FindFirstChild("Action")
+				if config and config:IsA("Configuration") then
+					config:SetAttribute("MissCooldown", value)
+					print("✅ Установлено у: " .. player.Name)
+					modified = true
+				end
+			end
+
+			for _, obj in pairs(game:GetDescendants()) do
+				if obj.Name == "Action" and obj:IsA("Configuration") then
+					obj:SetAttribute("MissCooldown", value)
+					print("✅ Установлено в:", obj:GetFullName())
+					modified = true
+				end
+			end
+
+			if not modified then
+				warn("❌ Не найден объект с атрибутом MissCooldown")
+			end
+		end
+
+		modifyMissCooldown()
+	end
+})
+
+local Button2 = TPTab:CreateButton({
+   Name = "NOPalletBreakSpeed",
+   Callback = function()
+
+-- Простой скрипт для изменения конфигурации Action
+local Players = game:GetService("Players")
+
+-- Настройки атрибутов (измени на нужные значения)
+local NEW_ATTRIBUTES = {
+    PalletBreakSpeed = 0          -- Убираем кулдаун промаха
+
 }
 
--- Общая функция для установки атрибута
-local function setAttributeEverywhere(attrName, value, configName)
-	configName = configName or "Action"
-	local modified = false
+print("🔧 Поиск и изменение конфигурации Action...")
 
-	-- По игрокам
-	for _, player in pairs(Players:GetPlayers()) do
-		local config = player:FindFirstChild(configName)
-		if config and config:IsA("Configuration") then
-			config:SetAttribute(attrName, value)
-			print("✅ Установлено у игрока", player.Name, attrName, "→", value)
-			modified = true
-		end
-	end
-
-	-- По всей игре
-	for _, obj in pairs(game:GetDescendants()) do
-		if obj.Name == configName and obj:IsA("Configuration") then
-			obj:SetAttribute(attrName, value)
-			print("✅ Установлено в", obj:GetFullName(), attrName, "→", value)
-			modified = true
-		end
-	end
-
-	if not modified then
-		warn("❌ Не найдено конфигураций для атрибута", attrName)
-	end
+-- Функция поиска и изменения объекта Action
+local function modifyActionConfig()
+    local modified = false
+    
+    -- Поиск в Players
+    for _, player in pairs(Players:GetPlayers()) do
+        local actionConfig = player:FindFirstChild("Action")
+        if actionConfig and actionConfig:IsA("Configuration") then
+            print("✅ Найден Action у игрока: " .. player.Name)
+            
+            -- Изменяем атрибуты
+            for attributeName, newValue in pairs(NEW_ATTRIBUTES) do
+                local oldValue = actionConfig:GetAttribute(attributeName)
+                actionConfig:SetAttribute(attributeName, newValue)
+                print("   🔧 " .. attributeName .. ": " .. tostring(oldValue) .. " → " .. tostring(newValue))
+            end
+            
+            modified = true
+        end
+    end
+    
+    -- Дополнительный поиск по всему workspace
+    for _, obj in pairs(game:GetDescendants()) do
+        if obj.Name == "Action" and obj:IsA("Configuration") then
+            print("✅ Найден дополнительный Action: " .. obj:GetFullName())
+            
+            -- Изменяем атрибуты
+            for attributeName, newValue in pairs(NEW_ATTRIBUTES) do
+                local oldValue = obj:GetAttribute(attributeName)
+                obj:SetAttribute(attributeName, newValue)
+                print("   🔧 " .. attributeName .. ": " .. tostring(oldValue) .. " → " .. tostring(newValue))
+            end
+            
+            modified = true
+        end
+    end
+    
+    return modified
 end
 
--- Создаём слайдеры
-for _, param in ipairs(PARAMETERS) do
-	TPTab:CreateSlider({
-		Name = param.label,
-		Range = {0.1, 10},
-		Increment = 0.1,
-		Suffix = "x",
-		CurrentValue = 1,
-		Flag = "Slider_" .. param.name,
-		Callback = function(value)
-			setAttributeEverywhere(param.name, value, param.configName)
-		end
-	})
+-- Выполняем изменения
+if modifyActionConfig() then
+    print("🎉 Конфигурация Action успешно изменена!")
+else
+    print("❌ Объект Action не найден")
 end
+
+print("✅ Скрипт завершен")
+
+	end,
+
+})
+
+local Button2 = TPTab:CreateButton({
+   Name = "NOWallBreakSpeed",
+   Callback = function()
+
+-- Простой скрипт для изменения конфигурации Action
+local Players = game:GetService("Players")
+
+-- Настройки атрибутов (измени на нужные значения)
+local NEW_ATTRIBUTES = {
+    WallBreakSpeed = 0          -- Убираем кулдаун промаха
+
+}
+
+print("🔧 Поиск и изменение конфигурации Action...")
+
+-- Функция поиска и изменения объекта Action
+local function modifyActionConfig()
+    local modified = false
+    
+    -- Поиск в Players
+    for _, player in pairs(Players:GetPlayers()) do
+        local actionConfig = player:FindFirstChild("Action")
+        if actionConfig and actionConfig:IsA("Configuration") then
+            print("✅ Найден Action у игрока: " .. player.Name)
+            
+            -- Изменяем атрибуты
+            for attributeName, newValue in pairs(NEW_ATTRIBUTES) do
+                local oldValue = actionConfig:GetAttribute(attributeName)
+                actionConfig:SetAttribute(attributeName, newValue)
+                print("   🔧 " .. attributeName .. ": " .. tostring(oldValue) .. " → " .. tostring(newValue))
+            end
+            
+            modified = true
+        end
+    end
+    
+    -- Дополнительный поиск по всему workspace
+    for _, obj in pairs(game:GetDescendants()) do
+        if obj.Name == "Action" and obj:IsA("Configuration") then
+            print("✅ Найден дополнительный Action: " .. obj:GetFullName())
+            
+            -- Изменяем атрибуты
+            for attributeName, newValue in pairs(NEW_ATTRIBUTES) do
+                local oldValue = obj:GetAttribute(attributeName)
+                obj:SetAttribute(attributeName, newValue)
+                print("   🔧 " .. attributeName .. ": " .. tostring(oldValue) .. " → " .. tostring(newValue))
+            end
+            
+            modified = true
+        end
+    end
+    
+    return modified
+end
+
+-- Выполняем изменения
+if modifyActionConfig() then
+    print("🎉 Конфигурация Action успешно изменена!")
+else
+    print("❌ Объект Action не найден")
+end
+
+print("✅ Скрипт завершен")
+
+	end,
+
+})
+
+local Button2 = TPTab:CreateButton({
+   Name = "NOwipeSpeed",
+   Callback = function()
+
+-- Простой скрипт для изменения конфигурации Action
+local Players = game:GetService("Players")
+
+-- Настройки атрибутов (измени на нужные значения)
+local NEW_ATTRIBUTES = {
+    WipeSpeed = 0          -- Убираем кулдаун промаха
+
+}
+
+print("🔧 Поиск и изменение конфигурации Action...")
+
+-- Функция поиска и изменения объекта Action
+local function modifyActionConfig()
+    local modified = false
+    
+    -- Поиск в Players
+    for _, player in pairs(Players:GetPlayers()) do
+        local actionConfig = player:FindFirstChild("Action")
+        if actionConfig and actionConfig:IsA("Configuration") then
+            print("✅ Найден Action у игрока: " .. player.Name)
+            
+            -- Изменяем атрибуты
+            for attributeName, newValue in pairs(NEW_ATTRIBUTES) do
+                local oldValue = actionConfig:GetAttribute(attributeName)
+                actionConfig:SetAttribute(attributeName, newValue)
+                print("   🔧 " .. attributeName .. ": " .. tostring(oldValue) .. " → " .. tostring(newValue))
+            end
+            
+            modified = true
+        end
+    end
+    
+    -- Дополнительный поиск по всему workspace
+    for _, obj in pairs(game:GetDescendants()) do
+        if obj.Name == "Action" and obj:IsA("Configuration") then
+            print("✅ Найден дополнительный Action: " .. obj:GetFullName())
+            
+            -- Изменяем атрибуты
+            for attributeName, newValue in pairs(NEW_ATTRIBUTES) do
+                local oldValue = obj:GetAttribute(attributeName)
+                obj:SetAttribute(attributeName, newValue)
+                print("   🔧 " .. attributeName .. ": " .. tostring(oldValue) .. " → " .. tostring(newValue))
+            end
+            
+            modified = true
+        end
+    end
+    
+    return modified
+end
+
+-- Выполняем изменения
+if modifyActionConfig() then
+    print("🎉 Конфигурация Action успешно изменена!")
+else
+    print("❌ Объект Action не найден")
+end
+
+print("✅ Скрипт завершен")
+
+	end,
+
+})
+
+local Button2 = TPTab:CreateButton({
+   Name = "NOwindowVaultSpeed",
+   Callback = function()
+
+-- Скрипт для изменения WindowVaultSpeed
+local Players = game:GetService("Players")
+
+-- Настройки (измени на нужные значения)
+local NEW_WINDOW_VAULT_SPEED = 0.1    -- Новая скорость (0.1 → 5 = в 50 раз быстрее!)
+
+print("🪟 Изменение скорости прыжков через окна...")
+
+-- Функция поиска и изменения Movement конфигурации
+local function modifyWindowVaultSpeed()
+    local modified = false
+    
+    -- Поиск в Players
+    for _, player in pairs(Players:GetPlayers()) do
+        local movementConfig = player:FindFirstChild("Movement")
+        if movementConfig and movementConfig:IsA("Configuration") then
+            local oldSpeed = movementConfig:GetAttribute("WindowVaultSpeed")
+            if oldSpeed then
+                movementConfig:SetAttribute("WindowVaultSpeed", NEW_WINDOW_VAULT_SPEED)
+                print("✅ " .. player.Name .. " WindowVaultSpeed: " .. tostring(oldSpeed) .. " → " .. tostring(NEW_WINDOW_VAULT_SPEED))
+                modified = true
+            end
+        end
+    end
+    
+    -- Дополнительный поиск по всей игре
+    for _, obj in pairs(game:GetDescendants()) do
+        if obj.Name == "Movement" and obj:IsA("Configuration") then
+            local oldSpeed = obj:GetAttribute("WindowVaultSpeed")
+            if oldSpeed then
+                obj:SetAttribute("WindowVaultSpeed", NEW_WINDOW_VAULT_SPEED)
+                print("✅ " .. obj:GetFullName() .. " WindowVaultSpeed изменен!")
+                modified = true
+            end
+        end
+    end
+    
+    return modified
+end
+
+-- Выполняем изменения
+if modifyWindowVaultSpeed() then
+    print("🎉 WindowVaultSpeed успешно изменен на " .. NEW_WINDOW_VAULT_SPEED .. "!")
+else
+    print("❌ Movement конфигурация не найдена")
+end
+
+print("✅ Скрипт завершен")
+
+	end,
+
+})
