@@ -1154,7 +1154,7 @@ MiscTab:CreateToggle({
     end
 })
 			
-local TPTab = Window:CreateTab(""Survivor", nil)
+local TPTab = Window:CreateTab("Survivor", nil)
 local Section = TPTab:CreateSection("for functions to work, click on them once, then just click on the letter next to the function")
 
 local player = game.Players.LocalPlayer
