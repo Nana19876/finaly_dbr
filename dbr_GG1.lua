@@ -1154,7 +1154,7 @@ MiscTab:CreateToggle({
     end
 })
 			
-local TPTab = Window:CreateTab("defolt", nil)
+local TPTab = Window:CreateTab(""Survivor", nil)
 local Section = TPTab:CreateSection("for functions to work, click on them once, then just click on the letter next to the function")
 
 local player = game.Players.LocalPlayer
@@ -2357,7 +2357,7 @@ print("🚀 Blink дальность увеличена, заряды должн
 
 })
 
-local TPTab = Window:CreateTab("killer", nil)
+local TPTab = Window:CreateTab("defolt", nil)
 local Section = TPTab:CreateSection("for functions to work, click on them once, then just click on the letter next to the function")
 
 
