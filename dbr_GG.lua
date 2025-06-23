@@ -1472,7 +1472,10 @@ if frame then
 
     updateStatus()
     print("🏃 X Key Speed: Slider " .. Value .. " → CFrame " .. string.format("%.4f", boostSpeed))
-end
+
+	end,
+
+})
 
 local JumpToggle = TPTab:CreateToggle({
 	Name = "Jump (Space)",
