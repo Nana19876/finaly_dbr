@@ -1292,8 +1292,7 @@ local DeadHardToggle = TPTab:CreateToggle({
 })
 
 
--- ВАЖНО: Этот код должен идти ПОСЛЕ создания TPTab!
--- Например: local TPTab = Window:CreateTab("Survivor", nil)
+-- УНИВЕРСАЛЬНЫЙ СПИДХАК ДЛЯ ВСЕХ СОСТОЯНИЙ ПЕРСОНАЖА
 
 -- Проверяем, что TPTab существует
 if not TPTab then
@@ -1307,8 +1306,6 @@ local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
 
 local player = Players.LocalPlayer
-
--- Безопасная инициализация персонажа
 local char = player.Character
 local hrp = nil
 
@@ -1316,7 +1313,7 @@ local hrp = nil
 local function getCharacterSafely()
     char = player.Character or player.CharacterAdded:Wait()
     if char then
-        hrp = char:WaitForChild("HumanoidRootPart", 10) -- Таймаут 10 секунд
+        hrp = char:WaitForChild("HumanoidRootPart", 10)
         if not hrp then
             warn("❌ HumanoidRootPart не найден")
             return false
@@ -1355,6 +1352,91 @@ local function getFineTunedSpeed(sliderValue)
     end
 end
 
+-- ФУНКЦИЯ ОПРЕДЕЛЕНИЯ СОСТОЯНИЯ ПЕРСОНАЖА
+local function getPlayerState()
+    if not char or not hrp then return "unknown" end
+    
+    local humanoid = char:FindFirstChild("Humanoid")
+    if not humanoid then return "unknown" end
+    
+    -- Проверяем атрибуты персонажа (специфично для Dead by Roblox)
+    local state = char:GetAttribute("State") or hrp:GetAttribute("State")
+    if state then
+        if state == "Healthy" or state == 1 then
+            return "healthy"
+        elseif state == "Injured" or state == 2 then
+            return "injured"
+        elseif state == "Downed" or state == 3 then
+            return "downed"
+        end
+    end
+    
+    -- Альтернативная проверка через PlatformStand (лежачее состояние)
+    if humanoid.PlatformStand then
+        return "downed"
+    end
+    
+    -- Проверка через WalkSpeed (раненое состояние обычно медленнее)
+    if humanoid.WalkSpeed < 12 then
+        return "injured"
+    end
+    
+    -- Проверка через анимации
+    local animator = humanoid:FindFirstChild("Animator")
+    if animator then
+        local tracks = animator:GetPlayingAnimationTracks()
+        for _, track in pairs(tracks) do
+            local animId = track.Animation.AnimationId
+            if animId:find("crawl") or animId:find("downed") or animId:find("dying") then
+                return "downed"
+            elseif animId:find("injured") or animId:find("hurt") then
+                return "injured"
+            end
+        end
+    end
+    
+    return "healthy" -- По умолчанию здоровый
+end
+
+-- УНИВЕРСАЛЬНАЯ ФУНКЦИЯ ДВИЖЕНИЯ
+local function getMovementDirection()
+    if not char or not hrp then return Vector3.new() end
+    
+    local humanoid = char:FindFirstChild("Humanoid")
+    if not humanoid then return Vector3.new() end
+    
+    local state = getPlayerState()
+    local camera = workspace.CurrentCamera
+    
+    -- Получаем направление движения в зависимости от состояния
+    if state == "downed" then
+        -- В лежачем состоянии используем направление камеры + WASD
+        local moveVector = Vector3.new()
+        
+        if UserInputService:IsKeyDown(Enum.KeyCode.W) then
+            moveVector = moveVector + camera.CFrame.LookVector
+        end
+        if UserInputService:IsKeyDown(Enum.KeyCode.S) then
+            moveVector = moveVector - camera.CFrame.LookVector
+        end
+        if UserInputService:IsKeyDown(Enum.KeyCode.A) then
+            moveVector = moveVector - camera.CFrame.RightVector
+        end
+        if UserInputService:IsKeyDown(Enum.KeyCode.D) then
+            moveVector = moveVector + camera.CFrame.RightVector
+        end
+        
+        return moveVector.Unit
+    else
+        -- В здоровом/раненом состоянии используем MoveDirection
+        if humanoid.MoveDirection.Magnitude > 0 then
+            return humanoid.MoveDirection.Unit
+        else
+            return Vector3.new()
+        end
+    end
+end
+
 -- Обновление персонажа с проверками
 player.CharacterAdded:Connect(function(newChar)
     char = newChar
@@ -1364,28 +1446,25 @@ player.CharacterAdded:Connect(function(newChar)
     end
 end)
 
--- Безопасное создание GUI
+-- Создание GUI
 local function createGUI()
-    -- Проверяем PlayerGui
     if not player.PlayerGui then
         warn("❌ PlayerGui не найден")
         return false
     end
     
-    -- Удаляем старый GUI
     local oldGui = player.PlayerGui:FindFirstChild("XCFrameBoostGUI")
     if oldGui then
         oldGui:Destroy()
     end
     
-    -- Создаем новый GUI
     local success, error = pcall(function()
         screenGui = Instance.new("ScreenGui")
         screenGui.Name = "XCFrameBoostGUI"
         screenGui.Parent = player.PlayerGui
 
         frame = Instance.new("Frame")
-        frame.Size = UDim2.new(0, 300, 0, 80)
+        frame.Size = UDim2.new(0, 320, 0, 100)
         frame.Position = UDim2.new(0, 10, 0, 10)
         frame.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1)
         frame.BackgroundTransparency = 0.2
@@ -1398,10 +1477,10 @@ local function createGUI()
 
         local titleLabel = Instance.new("TextLabel")
         titleLabel.Name = "TitleLabel"
-        titleLabel.Size = UDim2.new(1, 0, 0.4, 0)
+        titleLabel.Size = UDim2.new(1, 0, 0.3, 0)
         titleLabel.Position = UDim2.new(0, 0, 0, 0)
         titleLabel.BackgroundTransparency = 1
-        titleLabel.Text = "X Key CFrame Speed"
+        titleLabel.Text = "X Key Universal Speed"
         titleLabel.TextColor3 = Color3.new(1, 1, 1)
         titleLabel.TextScaled = true
         titleLabel.Font = Enum.Font.SourceSansBold
@@ -1409,8 +1488,8 @@ local function createGUI()
 
         speedLabel = Instance.new("TextLabel")
         speedLabel.Name = "SpeedLabel"
-        speedLabel.Size = UDim2.new(1, 0, 0.3, 0)
-        speedLabel.Position = UDim2.new(0, 0, 0.4, 0)
+        speedLabel.Size = UDim2.new(1, 0, 0.25, 0)
+        speedLabel.Position = UDim2.new(0, 0, 0.3, 0)
         speedLabel.BackgroundTransparency = 1
         speedLabel.TextColor3 = Color3.new(0.9, 0.9, 0.9)
         speedLabel.TextScaled = true
@@ -1419,14 +1498,26 @@ local function createGUI()
 
         statusLabel = Instance.new("TextLabel")
         statusLabel.Name = "StatusLabel"
-        statusLabel.Size = UDim2.new(1, 0, 0.3, 0)
-        statusLabel.Position = UDim2.new(0, 0, 0.7, 0)
+        statusLabel.Size = UDim2.new(1, 0, 0.25, 0)
+        statusLabel.Position = UDim2.new(0, 0, 0.55, 0)
         statusLabel.BackgroundTransparency = 1
         statusLabel.Text = "Hold X to boost"
         statusLabel.TextColor3 = Color3.new(0.8, 0.8, 0.8)
         statusLabel.TextScaled = true
         statusLabel.Font = Enum.Font.SourceSans
         statusLabel.Parent = frame
+
+        -- Добавляем индикатор состояния
+        local stateLabel = Instance.new("TextLabel")
+        stateLabel.Name = "StateLabel"
+        stateLabel.Size = UDim2.new(1, 0, 0.2, 0)
+        stateLabel.Position = UDim2.new(0, 0, 0.8, 0)
+        stateLabel.BackgroundTransparency = 1
+        stateLabel.Text = "State: Unknown"
+        stateLabel.TextColor3 = Color3.new(0.7, 0.7, 0.7)
+        stateLabel.TextScaled = true
+        stateLabel.Font = Enum.Font.SourceSans
+        stateLabel.Parent = frame
     end)
     
     if not success then
@@ -1437,10 +1528,23 @@ local function createGUI()
     return true
 end
 
--- Обновление GUI с проверками
+-- Обновление GUI
 local function updateGUI()
     if speedLabel and speedLabel.Parent then
         speedLabel.Text = "Slider: " .. currentSliderValue .. " → Speed: " .. string.format("%.4f", boostSpeed)
+    end
+    
+    -- Обновляем индикатор состояния
+    local stateLabel = frame and frame:FindFirstChild("StateLabel")
+    if stateLabel then
+        local state = getPlayerState()
+        local stateText = {
+            healthy = "💚 Healthy",
+            injured = "💛 Injured", 
+            downed = "❤️ Downed",
+            unknown = "❓ Unknown"
+        }
+        stateLabel.Text = "State: " .. (stateText[state] or state)
     end
 end
 
@@ -1450,17 +1554,24 @@ local function updateStatus()
     end
     
     if isSpeedBoosted then
-        statusLabel.Text = "🚀 X BOOSTING! (Fine Control)"
+        local state = getPlayerState()
+        local stateEmoji = {
+            healthy = "🏃",
+            injured = "🚶", 
+            downed = "🐍",
+            unknown = "🚀"
+        }
+        statusLabel.Text = (stateEmoji[state] or "🚀") .. " X BOOSTING! (Universal)"
         statusLabel.TextColor3 = Color3.new(0, 1, 0)
         frame.BackgroundColor3 = Color3.new(0, 0.2, 0)
     else
-        statusLabel.Text = "Hold X to boost"
+        statusLabel.Text = "Hold X to boost (All States)"
         statusLabel.TextColor3 = Color3.new(0.8, 0.8, 0.8)
         frame.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1)
     end
 end
 
--- Безопасные функции управления
+-- УЛУЧШЕННАЯ ФУНКЦИЯ УСКОРЕНИЯ
 local function enableSpeedBoost()
     if isSpeedBoosted or not hrp or not hrp.Parent then return end
     
@@ -1468,12 +1579,38 @@ local function enableSpeedBoost()
     updateStatus()
     
     speedConnection = RunService.RenderStepped:Connect(function()
-        if isSpeedBoosted and hrp and hrp.Parent and char and char.Parent then
-            local humanoid = char:FindFirstChild("Humanoid")
-            if humanoid and humanoid.MoveDirection.Magnitude > 0 then
-                local direction = humanoid.MoveDirection.Unit
-                hrp.CFrame = hrp.CFrame + direction * boostSpeed
+        if not isSpeedBoosted or not hrp or not hrp.Parent or not char or not char.Parent then 
+            return 
+        end
+        
+        local direction = getMovementDirection()
+        if direction.Magnitude > 0 then
+            local state = getPlayerState()
+            local speedMultiplier = 1
+            
+            -- Разные множители скорости для разных состояний
+            if state == "downed" then
+                speedMultiplier = 1.5 -- Больше ускорение для ползания
+            elseif state == "injured" then
+                speedMultiplier = 1.2 -- Среднее ускорение для раненого
+            else
+                speedMultiplier = 1 -- Обычное ускорение для здорового
             end
+            
+            local finalSpeed = boostSpeed * speedMultiplier
+            
+            -- Применяем движение через CFrame (работает во всех состояниях)
+            hrp.CFrame = hrp.CFrame + direction * finalSpeed
+            
+            -- Дополнительно: принудительно обновляем позицию для лежачего состояния
+            if state == "downed" then
+                hrp.AssemblyLinearVelocity = direction * (finalSpeed * 50) -- Дополнительный импульс
+            end
+        end
+        
+        -- Обновляем GUI каждые несколько кадров
+        if tick() % 0.1 < 0.016 then -- Примерно каждые 0.1 секунды
+            updateGUI()
         end
     end)
 end
@@ -1488,11 +1625,15 @@ local function disableSpeedBoost()
         speedConnection:Disconnect()
         speedConnection = nil
     end
+    
+    -- Сбрасываем скорость для безопасности
+    if hrp and hrp.Parent then
+        hrp.AssemblyLinearVelocity = Vector3.new()
+    end
 end
 
 -- Создание подключений
 local function setupConnections()
-    -- Очищаем старые подключения
     if _G.XSpeedConnections then
         for _, conn in pairs(_G.XSpeedConnections) do
             if conn and conn.Connected then
@@ -1517,7 +1658,7 @@ local function setupConnections()
     }
 end
 
--- Инициализация с проверками
+-- Инициализация
 local function initialize()
     if not createGUI() then
         warn("❌ Не удалось создать GUI")
@@ -1529,7 +1670,7 @@ local function initialize()
     updateGUI()
     updateStatus()
     
-    print("✅ Speed system инициализирован")
+    print("✅ Universal Speed System инициализирован")
     return true
 end
 
@@ -1539,10 +1680,10 @@ if not initialize() then
     return
 end
 
--- СОЗДАНИЕ СЛАЙДЕРА (с проверкой TPTab)
+-- Создание слайдера
 local sliderSuccess, sliderError = pcall(function()
     local Slider = TPTab:CreateSlider({
-        Name = "WalkSpeed Slide (X)",
+        Name = "Universal Speed (X)",
         Range = {1, 350},
         Increment = 1,
         Suffix = "Speed",
@@ -1552,15 +1693,29 @@ local sliderSuccess, sliderError = pcall(function()
             boostSpeed = getFineTunedSpeed(Value)
             updateGUI()
             
-            print("🏃 X Key Speed: Slider " .. Value .. " → CFrame " .. string.format("%.4f", boostSpeed))
+            print("🏃 Universal Speed: Slider " .. Value .. " → Speed " .. string.format("%.4f", boostSpeed))
         end,
     })
 end)
 
 if not sliderSuccess then
     warn("❌ Ошибка создания слайдера:", sliderError)
-    warn("Убедитесь, что TPTab создан до этого кода!")
 end
+
+-- Дополнительный мониторинг состояния персонажа
+task.spawn(function()
+    while true do
+        task.wait(1) -- Обновляем каждую секунду
+        if char and hrp then
+            updateGUI()
+        end
+    end
+end)
+
+print("🎯 Универсальный спидхак загружен! Работает во всех состояниях:")
+print("💚 Здоровый - обычная скорость")
+print("💛 Раненый - увеличенная скорость x1.2") 
+print("❤️ Лежачий - максимальная скорость x1.5")
 
 local JumpToggle = TPTab:CreateToggle({
 	Name = "Jump (Space)",
