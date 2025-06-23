@@ -2530,12 +2530,10 @@ local Slider = TPTab:CreateSlider({
 	end
 })
 
---=== НАСТРОЙКИ ===============================================================
-
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 
--- Гарантируем, что выбранные значения всегда строка
+-- Ensure value is always a string
 local function asString(opt)
 	if typeof(opt) == "table" then
 		return tostring(opt[1])
@@ -2544,18 +2542,18 @@ local function asString(opt)
 	end
 end
 
--- Получение папки для Survivor или Killer
-local function getPerkFolder(kind)  -- "Survivor" или "Killer"
+-- Get folder: Survivor or Killer
+local function getPerkFolder(kind)
 	local data   = player:FindFirstChild("Data")
 	local perks  = data and data:FindFirstChild("Perks")
 	local folder = perks and perks:FindFirstChild(kind)
 	if not folder then
-		warn("❌ Папка не найдена: " .. kind)
+		warn("❌ Folder not found: " .. kind)
 	end
 	return folder
 end
 
--- Добавление нового перка
+-- Add new perk
 local function addPerk(kind, name, slot, level)
 	name = asString(name)
 	slot = asString(slot)
@@ -2564,7 +2562,7 @@ local function addPerk(kind, name, slot, level)
 	if not folder then return end
 
 	if folder:FindFirstChild(name) then
-		warn("⚠ Перк уже существует: " .. name)
+		warn("⚠ Perk already exists: " .. name)
 		return
 	end
 
@@ -2574,10 +2572,10 @@ local function addPerk(kind, name, slot, level)
 	perk:SetAttribute("Slot", slot)
 	perk.Parent = folder
 
-	print(("✅ Добавлен %s-перк: %s (Lvl %s, %s)"):format(kind, name, level, slot))
+	print(("✅ %s perk added: %s (Level %s, %s)"):format(kind, name, level, slot))
 end
 
--- === Списки перков ===
+-- === Perk Lists ===
 local SURVIVOR_PERKS = {
 	"Adrenaline", "BalancedLanding", "BetterThanEver", "Bird Watcher",
 	"Blessing:Fresh Air", "Blessing:Healing Aid", "Blessing:In The Shadows",
@@ -2614,10 +2612,10 @@ local selectedSurvivorPerk = SURVIVOR_PERKS[1]
 local selectedSurvivorSlot = PERK_SLOTS[1]
 local selectedSurvivorLevel = 1
 
-perkTab:CreateSection("Survivor")
+perkTab:CreateSection("Add Survivor Perk")
 
 perkTab:CreateDropdown({
-	Name = "Survivor-перк",
+	Name = "Survivor Perk",
 	Options = SURVIVOR_PERKS,
 	CurrentOption = selectedSurvivorPerk,
 	MultiSelection = false,
@@ -2627,7 +2625,7 @@ perkTab:CreateDropdown({
 })
 
 perkTab:CreateDropdown({
-	Name = "Слот",
+	Name = "Slot",
 	Options = PERK_SLOTS,
 	CurrentOption = selectedSurvivorSlot,
 	MultiSelection = false,
@@ -2637,7 +2635,7 @@ perkTab:CreateDropdown({
 })
 
 perkTab:CreateDropdown({
-	Name = "Уровень",
+	Name = "Level",
 	Options = { "1", "2", "3" },
 	CurrentOption = tostring(selectedSurvivorLevel),
 	MultiSelection = false,
@@ -2647,7 +2645,7 @@ perkTab:CreateDropdown({
 })
 
 perkTab:CreateButton({
-	Name = "➕ Добавить Survivor-перк",
+	Name = "➕ Add Survivor Perk",
 	Callback = function()
 		addPerk("Survivor", selectedSurvivorPerk, selectedSurvivorSlot, selectedSurvivorLevel)
 	end,
@@ -2658,10 +2656,10 @@ local selectedKillerPerk = KILLER_PERKS[1]
 local selectedKillerSlot = PERK_SLOTS[1]
 local selectedKillerLevel = 1
 
-perkTab:CreateSection("Killer")
+perkTab:CreateSection("Add Killer Perk")
 
 perkTab:CreateDropdown({
-	Name = "Killer-перк",
+	Name = "Killer Perk",
 	Options = KILLER_PERKS,
 	CurrentOption = selectedKillerPerk,
 	MultiSelection = false,
@@ -2671,7 +2669,7 @@ perkTab:CreateDropdown({
 })
 
 perkTab:CreateDropdown({
-	Name = "Слот",
+	Name = "Slot",
 	Options = PERK_SLOTS,
 	CurrentOption = selectedKillerSlot,
 	MultiSelection = false,
@@ -2681,7 +2679,7 @@ perkTab:CreateDropdown({
 })
 
 perkTab:CreateDropdown({
-	Name = "Уровень",
+	Name = "Level",
 	Options = { "1", "2", "3" },
 	CurrentOption = tostring(selectedKillerLevel),
 	MultiSelection = false,
@@ -2691,13 +2689,10 @@ perkTab:CreateDropdown({
 })
 
 perkTab:CreateButton({
-	Name = "➕ Добавить Killer-перк",
+	Name = "➕ Add Killer Perk",
 	Callback = function()
 		addPerk("Killer", selectedKillerPerk, selectedKillerSlot, selectedKillerLevel)
 	end,
 })
 
-print("🎛️ Интерфейс Perks полностью загружен")
-
-
-
+print("🎛️ Perk GUI fully loaded.")
