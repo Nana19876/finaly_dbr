@@ -2576,7 +2576,7 @@ local selectedSurvivorLevel = perkLevels[1]
 perkTab:CreateSection("Добавить Survivor-перк")
 
 perkTab:CreateDropdown({
-	Name = "Survivor: Выбери перк",
+	Name = "Survivor: perk",
 	Options = survivorPerks,
 	CurrentOption = selectedSurvivorPerk,
 	Callback = function(option)
@@ -2585,7 +2585,7 @@ perkTab:CreateDropdown({
 })
 
 perkTab:CreateDropdown({
-	Name = "Слот",
+	Name = "slot",
 	Options = perkSlots,
 	CurrentOption = selectedSurvivorSlot,
 	Callback = function(option)
@@ -2594,7 +2594,7 @@ perkTab:CreateDropdown({
 })
 
 perkTab:CreateDropdown({
-	Name = "Уровень",
+	Name = "level",
 	Options = { "1", "2", "3" },
 	CurrentOption = tostring(selectedSurvivorLevel),
 	Callback = function(option)
@@ -2603,7 +2603,7 @@ perkTab:CreateDropdown({
 })
 
 perkTab:CreateButton({
-	Name = "✅ Добавить Survivor-перк",
+	Name = "add Survivor-perk",
 	Callback = function()
 		local survivorFolder = player:FindFirstChild("Data") and player.Data:FindFirstChild("Perks") and player.Data.Perks:FindFirstChild("Survivor")
 		if not survivorFolder then
