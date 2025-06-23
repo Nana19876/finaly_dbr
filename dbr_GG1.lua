@@ -657,6 +657,49 @@ end)
 -- Цвет и список объектов для генераторов
 local generatorColor = Color3.fromRGB(0, 255, 255)
 local generatorESPObjects = {}
+local espRadius = 100 -- Радиус в стадах
+local updateConnection = nil
+
+-- Функция для вычисления расстояния между игроком и объектом
+local function getDistanceToPlayer(part)
+    local player = game.Players.LocalPlayer
+    if not player.Character or not player.Character:FindFirstChild("HumanoidRootPart") then
+        return math.huge
+    end
+    
+    local playerPosition = player.Character.HumanoidRootPart.Position
+    local partPosition = part.Position
+    return (playerPosition - partPosition).Magnitude
+end
+
+-- Функция для обновления видимости ESP на основе расстояния
+local function updateGeneratorESP()
+    if not _G.GeneratorESP then return end
+    
+    for _, espObj in pairs(generatorESPObjects) do
+        if espObj and espObj.PrimaryPart then
+            local distance = getDistanceToPlayer(espObj.PrimaryPart)
+            local shouldShow = distance <= espRadius
+            
+            -- Включаем/выключаем ESP объект в зависимости от расстояния
+            if espObj.Enabled ~= shouldShow then
+                espObj.Enabled = shouldShow
+            end
+        end
+    end
+end
+
+-- Слайдер для настройки радиуса ESP генераторов
+MiscTab:CreateSlider({
+    Name = "Радиус ESP генераторов",
+    Range = {10, 500},
+    Increment = 10,
+    CurrentValue = espRadius,
+    Flag = "GeneratorESPRadius",
+    Callback = function(Value)
+        espRadius = Value
+    end,
+})
 
 -- ColorPicker для генераторов
 MiscTab:CreateColorPicker({
@@ -718,16 +761,27 @@ MiscTab:CreateToggle({
                         Color = generatorColor,
                         PrimaryPart = part
                     })
+                    -- Изначально выключаем ESP объект
+                    espObj.Enabled = false
                     table.insert(generatorESPObjects, espObj)
                 else
                     warn("Не найден CollisionBox у Generator" .. i)
                 end
             end
 
+            -- Запускаем цикл обновления расстояния
+            updateConnection = game:GetService("RunService").Heartbeat:Connect(updateGeneratorESP)
+
         else
             -- Выключаем ESP
             if _G.GeneratorESP then
                 _G.GeneratorESP:Toggle(false)
+            end
+
+            -- Останавливаем цикл обновления
+            if updateConnection then
+                updateConnection:Disconnect()
+                updateConnection = nil
             end
 
             for _, obj in pairs(generatorESPObjects) do
