@@ -2530,149 +2530,148 @@ local Slider = TPTab:CreateSlider({
 	end
 })
 
+--=== НАСТРОЙКИ ===============================================================
+
 local Players = game:GetService("Players")
-local player = Players.LocalPlayer
+local player  = Players.LocalPlayer
 
--- 📋 Survivor-перки
-local survivorPerksList = {
-	"Adrenaline", "BalancedLanding", "BetterThanEver", "Bird Watcher",
-	"Blessing:Fresh Air", "Blessing:Healing Aid", "Blessing:In The Shadows",
-	"Bond", "Borrowed Time BotanyKnowledge", "DeadHard", "DecisiveStrike",
-	"Deliverance", "EmpoweringStrength", "ExperimentalTech", "Fearless",
-	"Fixated", "Focused", "Fugitive", "FullFocus", "Guardian", "HeadOn",
-	"Lithe", "MedicalRemains", "No Mither", "ObjectOfObsession", "Opportunist",
-	"Perseverance", "QuickFix Rakish Resilience", "Resourceful", "Scrapper",
-	"SelfCare", "Serene", "ShockingSurprise", "Slippery Meat", "SpineChill",
-	"SprintBurst", "Template", "Tenacity", "The Savier", "Tic Tac",
-	"Ultimate Escape", "Unbreakable", "UrbanEvasion", "WellMakelt"
+-- Перки Survivor
+local SURVIVOR_PERKS = {
+	"Adrenaline","BalancedLanding","BetterThanEver","Bird Watcher",
+	"Blessing:Fresh Air","Blessing:Healing Aid","Blessing:In The Shadows",
+	"Bond","Borrowed Time BotanyKnowledge","DeadHard","DecisiveStrike",
+	"Deliverance","EmpoweringStrength","ExperimentalTech","Fearless",
+	"Fixated","Focused","Fugitive","FullFocus","Guardian","HeadOn","Lithe",
+	"MedicalRemains","No Mither","ObjectOfObsession","Opportunist",
+	"Perseverance","QuickFix Rakish Resilience","Resourceful","Scrapper",
+	"SelfCare","Serene","ShockingSurprise","Slippery Meat","SpineChill",
+	"SprintBurst","Template","Tenacity","The Savier","Tic Tac",
+	"Ultimate Escape","Unbreakable","UrbanEvasion","WellMakelt"
 }
 
--- 📋 Killer-перки
-local killerPerksList = {
-	"Pop Goes The Weasel", "Power Swing", "Pressured", "Retaliation",
-	"Rigged Game", "Sabotage", "SaveTheBestForLast", "ShadowVault",
-	"Shadowborn", "Silence", "SpiritFury", "StunningEncore", "Swift Frisson",
-	"Template", "Thrill of the Hunt", "Tight Grip Unrelenting", "Whispers",
-	"BarbecueAndChilli", "Blood Warden", "BrutalStrength", "Caretaker Vision",
-	"Challenge", "CriticalStrike", "Curse:Borrowed Light", "Curse:Lockdown",
-	"Curse:Resurrection", "Deadlights", "Dissent", "DominoEffect", "Enduring",
-	"Entity's Touch", "GrowingFixation", "Hex: No One Escapes Death", "Hex: Ruin",
-	"Loot Goblin", "Natural Acrobat", "Ninja Tactics", "Payback"
+-- Перки Killer
+local KILLER_PERKS = {
+	"Pop Goes The Weasel","Power Swing","Pressured","Retaliation","Rigged Game",
+	"Sabotage","SaveTheBestForLast","ShadowVault","Shadowborn","Silence",
+	"SpiritFury","StunningEncore","Swift Frisson","Template","Thrill of the Hunt",
+	"Tight Grip Unrelenting","Whispers","BarbecueAndChilli","Blood Warden",
+	"BrutalStrength","Caretaker Vision","Challenge","CriticalStrike",
+	"Curse:Borrowed Light","Curse:Lockdown","Curse:Resurrection","Deadlights",
+	"Dissent","DominoEffect","Enduring","Entity's Touch","GrowingFixation",
+	"Hex: No One Escapes Death","Hex: Ruin","Loot Goblin","Natural Acrobat",
+	"Ninja Tactics","Payback"
 }
 
-local perkSlots = { "Slot1", "Slot2", "Slot3", "Slot4" }
-local perkLevels = { 1, 2, 3 }
+local PERK_SLOTS  = { "Slot1", "Slot2", "Slot3", "Slot4" }
+local PERK_LEVELS = { 1, 2, 3 }
 
--- Выборы по умолчанию
-local selectedSurvivorPerk = survivorPerksList[1]
-local selectedSurvivorSlot = perkSlots[1]
-local selectedSurvivorLevel = 1
+--=== УТИЛИТЫ =================================================================
 
-local selectedKillerPerk = killerPerksList[1]
-local selectedKillerSlot = perkSlots[1]
-local selectedKillerLevel = 1
+-- Безопасно достаём Data/Perks/<тип>, возвращаем nil + сообщение, если нет
+local function getPerkFolder(kind)  -- kind = "Survivor" | "Killer"
+	local data   = player:FindFirstChild("Data")
+	local perks  = data and data:FindFirstChild("Perks")
+	local target = perks and perks:FindFirstChild(kind)
+	if not target then
+		warn(("❌ Папка %s не найдена"):format(kind))
+	end
+	return target
+end
 
--- Создаём вкладку
+-- Создаём IntValue-перк, если ещё нет
+local function addPerk(kind, name, slot, level)
+	local folder = getPerkFolder(kind)
+	if not folder then return end
+
+	if folder:FindFirstChild(name) then
+		warn(("⚠ Перк уже существует: %s (%s)"):format(name, kind))
+		return
+	end
+
+	local perk = Instance.new("IntValue")
+	perk.Name  = name
+	perk.Value = level
+	perk:SetAttribute("Slot", slot)
+	perk.Parent = folder
+
+	print(("✅ Добавлен %s-перк «%s» (Lvl %s, %s)")
+		:format(kind, name, level, slot))
+end
+
+--=== GUI (Rayfield) ===========================================================
+
 local perkTab = Window:CreateTab("Perks", nil)
 
--- === GUI: Survivor ===
-perkTab:CreateSection("Добавить Survivor-перк")
+----------------------- Survivor ---------------------------------------------
+local selSurvPerk  = SURVIVOR_PERKS[1]
+local selSurvSlot  = PERK_SLOTS[1]
+local selSurvLevel = PERK_LEVELS[1]
+
+perkTab:CreateSection("Survivor")
 
 perkTab:CreateDropdown({
-	Name = "Выбери перк (Survivor)",
-	Options = survivorPerksList,
-	CurrentOption = selectedSurvivorPerk,
-	Callback = function(option)
-		selectedSurvivorPerk = option
-	end,
+	Name = "Survivor-перк",
+	Options = SURVIVOR_PERKS,
+	CurrentOption = selSurvPerk,
+	Callback = function(opt) selSurvPerk = opt end,
 })
 
 perkTab:CreateDropdown({
-	Name = "Выбери слот",
-	Options = perkSlots,
-	CurrentOption = selectedSurvivorSlot,
-	Callback = function(option)
-		selectedSurvivorSlot = option
-	end,
-})
-
-perkTab:CreateDropdown({
-	Name = "Уровень",
-	Options = { "1", "2", "3" },
-	CurrentOption = tostring(selectedSurvivorLevel),
-	Callback = function(option)
-		selectedSurvivorLevel = tonumber(option)
-	end,
-})
-
-perkTab:CreateButton({
-	Name = "✅ Добавить Survivor-перк",
-	Callback = function()
-		local survivorPerks = player:WaitForChild("Data"):WaitForChild("Perks"):WaitForChild("Survivor")
-
-		if survivorPerks:FindFirstChild(selectedSurvivorPerk) then
-			warn("⚠ Перк уже существует: " .. selectedSurvivorPerk)
-			return
-		end
-
-		local newPerk = Instance.new("IntValue")
-		newPerk.Name = selectedSurvivorPerk
-		newPerk.Value = selectedSurvivorLevel
-		newPerk:SetAttribute("Slot", selectedSurvivorSlot)
-		newPerk.Parent = survivorPerks
-
-		print("✅ Перк " .. selectedSurvivorPerk .. " добавлен в Survivor!")
-	end,
-})
-
--- === GUI: Killer ===
-perkTab:CreateSection("Добавить Killer-перк")
-
-perkTab:CreateDropdown({
-	Name = "Выбери перк (Killer)",
-	Options = killerPerksList,
-	CurrentOption = selectedKillerPerk,
-	Callback = function(option)
-		selectedKillerPerk = option
-	end,
-})
-
-perkTab:CreateDropdown({
-	Name = "Выбери слот",
-	Options = perkSlots,
-	CurrentOption = selectedKillerSlot,
-	Callback = function(option)
-		selectedKillerSlot = option
-	end,
+	Name = "Слот",
+	Options = PERK_SLOTS,
+	CurrentOption = selSurvSlot,
+	Callback = function(opt) selSurvSlot = opt end,
 })
 
 perkTab:CreateDropdown({
 	Name = "Уровень",
-	Options = { "1", "2", "3" },
-	CurrentOption = tostring(selectedKillerLevel),
-	Callback = function(option)
-		selectedKillerLevel = tonumber(option)
-	end,
+	Options = { "1","2","3" },
+	CurrentOption = tostring(selSurvLevel),
+	Callback = function(opt) selSurvLevel = tonumber(opt) end,
 })
 
 perkTab:CreateButton({
-	Name = "✅ Добавить Killer-перк",
+	Name = "➕ Добавить Survivor-перк",
 	Callback = function()
-		local killerPerks = player:WaitForChild("Data"):WaitForChild("Perks"):WaitForChild("Killer")
-
-		if killerPerks:FindFirstChild(selectedKillerPerk) then
-			warn("⚠ Перк уже существует: " .. selectedKillerPerk)
-			return
-		end
-
-		local newPerk = Instance.new("IntValue")
-		newPerk.Name = selectedKillerPerk
-		newPerk.Value = selectedKillerLevel
-		newPerk:SetAttribute("Slot", selectedKillerSlot)
-		newPerk.Parent = killerPerks
-
-		print("✅ Перк " .. selectedKillerPerk .. " добавлен в Killer!")
+		addPerk("Survivor", selSurvPerk, selSurvSlot, selSurvLevel)
 	end,
 })
+
+----------------------- Killer -----------------------------------------------
+local selKillPerk  = KILLER_PERKS[1]
+local selKillSlot  = PERK_SLOTS[1]
+local selKillLevel = PERK_LEVELS[1]
+
+perkTab:CreateSection("Killer")
+
+perkTab:CreateDropdown({
+	Name = "Killer-перк",
+	Options = KILLER_PERKS,
+	CurrentOption = selKillPerk,
+	Callback = function(opt) selKillPerk = opt end,
+})
+
+perkTab:CreateDropdown({
+	Name = "Слот",
+	Options = PERK_SLOTS,
+	CurrentOption = selKillSlot,
+	Callback = function(opt) selKillSlot = opt end,
+})
+
+perkTab:CreateDropdown({
+	Name = "Уровень",
+	Options = { "1","2","3" },
+	CurrentOption = tostring(selKillLevel),
+	Callback = function(opt) selKillLevel = tonumber(opt) end,
+})
+
+perkTab:CreateButton({
+	Name = "➕ Добавить Killer-перк",
+	Callback = function()
+		addPerk("Killer", selKillPerk, selKillSlot, selKillLevel)
+	end,
+})
+
+print("🎛️ GUI Perks загружен — проверяй!")
 
 
