@@ -1292,62 +1292,56 @@ local DeadHardToggle = TPTab:CreateToggle({
 })
 
 
-local Slider = TPTab:CreateSlider({
-   Name = "WalkSpeed Slide (X)",
-   Range = {1, 350},
-   Increment = 1,
-   Suffix = "Speed",
-   CurrentValue = 16,
-   Callback = function(Value)
-
--- Очень тонкая настройка скорости для CFrame на клавишу X
-local function getFineTunedSpeed(sliderValue)
-    -- Гораздо меньшие значения для более точного контроля
-    if sliderValue <= 16 then
-        -- Для стандартных значений: 1-16 -> 0.005-0.08
-        return sliderValue * 0.005
-    elseif sliderValue <= 50 then
-        -- Для средних значений: 17-50 -> 0.08-0.15
-        return 0.08 + (sliderValue - 16) * 0.002
-    elseif sliderValue <= 100 then
-        -- Для высоких значений: 51-100 -> 0.15-0.25
-        return 0.15 + (sliderValue - 50) * 0.002
-    else
-        -- Для очень высоких значений: 101-350 -> 0.25-0.5
-        return 0.25 + (sliderValue - 100) * 0.001
-    end
-end
-
+-- Инициализация сервисов (ВЫНЕСЕНО ИЗ CALLBACK)
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
 
 local player = Players.LocalPlayer
-
--- ИСПРАВЛЕНИЕ 1: Определяем Value (замените на нужное значение)
-local Value = 50 -- Или получите это значение из слайдера/настроек
-
 local char = player.Character or player.CharacterAdded:Wait()
 local hrp = char:WaitForChild("HumanoidRootPart")
 
--- ИСПРАВЛЕНИЕ 2: Правильное обновление персонажа
+-- Глобальные переменные
+local currentSliderValue = 16 -- Начальное значение
+local boostSpeed = 0
+local isSpeedBoosted = false
+local speedConnection = nil
+local screenGui = nil
+local frame = nil
+local speedLabel = nil
+local statusLabel = nil
+
+-- Очень тонкая настройка скорости для CFrame на клавишу X
+local function getFineTunedSpeed(sliderValue)
+    if sliderValue <= 16 then
+        return sliderValue * 0.005
+    elseif sliderValue <= 50 then
+        return 0.08 + (sliderValue - 16) * 0.002
+    elseif sliderValue <= 100 then
+        return 0.15 + (sliderValue - 50) * 0.002
+    else
+        return 0.25 + (sliderValue - 100) * 0.001
+    end
+end
+
+-- Обновление персонажа
 player.CharacterAdded:Connect(function(newChar)
     char = newChar
     hrp = char:WaitForChild("HumanoidRootPart")
 end)
 
-local boostSpeed = getFineTunedSpeed(Value)
-local isSpeedBoosted = false
-local speedConnection = nil
-
--- Создание/обновление GUI
-local screenGui = player.PlayerGui:FindFirstChild("XCFrameBoostGUI")
-if not screenGui then
+-- Создание GUI (ОДИН РАЗ)
+local function createGUI()
+    screenGui = player.PlayerGui:FindFirstChild("XCFrameBoostGUI")
+    if screenGui then
+        screenGui:Destroy() -- Удаляем старый GUI если есть
+    end
+    
     screenGui = Instance.new("ScreenGui")
     screenGui.Name = "XCFrameBoostGUI"
     screenGui.Parent = player.PlayerGui
 
-    local frame = Instance.new("Frame")
+    frame = Instance.new("Frame")
     frame.Size = UDim2.new(0, 300, 0, 80)
     frame.Position = UDim2.new(0, 10, 0, 10)
     frame.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1)
@@ -1370,18 +1364,17 @@ if not screenGui then
     titleLabel.Font = Enum.Font.SourceSansBold
     titleLabel.Parent = frame
 
-    local speedLabel = Instance.new("TextLabel")
+    speedLabel = Instance.new("TextLabel")
     speedLabel.Name = "SpeedLabel"
     speedLabel.Size = UDim2.new(1, 0, 0.3, 0)
     speedLabel.Position = UDim2.new(0, 0, 0.4, 0)
     speedLabel.BackgroundTransparency = 1
-    speedLabel.Text = "Slider: " .. Value .. " → Speed: " .. string.format("%.4f", boostSpeed)
     speedLabel.TextColor3 = Color3.new(0.9, 0.9, 0.9)
     speedLabel.TextScaled = true
     speedLabel.Font = Enum.Font.SourceSans
     speedLabel.Parent = frame
 
-    local statusLabel = Instance.new("TextLabel")
+    statusLabel = Instance.new("TextLabel")
     statusLabel.Name = "StatusLabel"
     statusLabel.Size = UDim2.new(1, 0, 0.3, 0)
     statusLabel.Position = UDim2.new(0, 0, 0.7, 0)
@@ -1393,60 +1386,57 @@ if not screenGui then
     statusLabel.Parent = frame
 end
 
--- ИСПРАВЛЕНИЕ 3: Проверка существования GUI элементов
-local frame = screenGui:FindFirstChild("Frame")
-if frame then
-    local speedLabel = frame:FindFirstChild("SpeedLabel")
-    local statusLabel = frame:FindFirstChild("StatusLabel")
-    
+-- Обновление GUI
+local function updateGUI()
     if speedLabel then
-        speedLabel.Text = "Slider: " .. Value .. " → Speed: " .. string.format("%.4f", boostSpeed)
+        speedLabel.Text = "Slider: " .. currentSliderValue .. " → Speed: " .. string.format("%.4f", boostSpeed)
     end
+end
 
-    local function updateStatus()
-        if not statusLabel or not frame then return end
-        
-        if isSpeedBoosted then
-            statusLabel.Text = "🚀 X BOOSTING! (Fine Control)"
-            statusLabel.TextColor3 = Color3.new(0, 1, 0)
-            frame.BackgroundColor3 = Color3.new(0, 0.2, 0)
-        else
-            statusLabel.Text = "Hold X to boost"
-            statusLabel.TextColor3 = Color3.new(0.8, 0.8, 0.8)
-            frame.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1)
-        end
+local function updateStatus()
+    if not statusLabel or not frame then return end
+    
+    if isSpeedBoosted then
+        statusLabel.Text = "🚀 X BOOSTING! (Fine Control)"
+        statusLabel.TextColor3 = Color3.new(0, 1, 0)
+        frame.BackgroundColor3 = Color3.new(0, 0.2, 0)
+    else
+        statusLabel.Text = "Hold X to boost"
+        statusLabel.TextColor3 = Color3.new(0.8, 0.8, 0.8)
+        frame.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1)
     end
+end
 
-    -- Функции управления
-    local function enableSpeedBoost()
-        if isSpeedBoosted then return end
-        isSpeedBoosted = true
-        updateStatus()
-        
-        speedConnection = RunService.RenderStepped:Connect(function()
-            -- ИСПРАВЛЕНИЕ 4: Дополнительные проверки
-            if isSpeedBoosted and hrp and hrp.Parent and char and char.Parent then
-                local humanoid = char:FindFirstChild("Humanoid")
-                if humanoid and humanoid.MoveDirection.Magnitude > 0 then
-                    local direction = humanoid.MoveDirection.Unit
-                    hrp.CFrame = hrp.CFrame + direction * boostSpeed
-                end
+-- Функции управления
+local function enableSpeedBoost()
+    if isSpeedBoosted then return end
+    isSpeedBoosted = true
+    updateStatus()
+    
+    speedConnection = RunService.RenderStepped:Connect(function()
+        if isSpeedBoosted and hrp and hrp.Parent and char and char.Parent then
+            local humanoid = char:FindFirstChild("Humanoid")
+            if humanoid and humanoid.MoveDirection.Magnitude > 0 then
+                local direction = humanoid.MoveDirection.Unit
+                hrp.CFrame = hrp.CFrame + direction * boostSpeed
             end
-        end)
-    end
-
-    local function disableSpeedBoost()
-        if not isSpeedBoosted then return end
-        isSpeedBoosted = false
-        updateStatus()
-        
-        if speedConnection then
-            speedConnection:Disconnect()
-            speedConnection = nil
         end
-    end
+    end)
+end
 
-    -- Управление подключениями
+local function disableSpeedBoost()
+    if not isSpeedBoosted then return end
+    isSpeedBoosted = false
+    updateStatus()
+    
+    if speedConnection then
+        speedConnection:Disconnect()
+        speedConnection = nil
+    end
+end
+
+-- Создание подключений (ОДИН РАЗ)
+local function setupConnections()
     if _G.XSpeedConnections then
         for _, conn in pairs(_G.XSpeedConnections) do
             if conn then
@@ -1469,12 +1459,30 @@ if frame then
             end
         end)
     }
+end
 
-    updateStatus()
-    print("🏃 X Key Speed: Slider " .. Value .. " → CFrame " .. string.format("%.4f", boostSpeed))
+-- Инициализация
+createGUI()
+setupConnections()
+boostSpeed = getFineTunedSpeed(currentSliderValue)
+updateGUI()
+updateStatus()
 
-	end,
-
+-- ТЕПЕРЬ СОЗДАЕМ СЛАЙДЕР
+local Slider = TPTab:CreateSlider({
+    Name = "WalkSpeed Slide (X)",
+    Range = {1, 350},
+    Increment = 1,
+    Suffix = "Speed",
+    CurrentValue = 16,
+    Callback = function(Value) -- ИСПРАВЛЕНО: используем параметр Value правильно
+        -- Обновляем только значения при изменении слайдера
+        currentSliderValue = Value -- ИСПРАВЛЕНО: не переопределяем параметр
+        boostSpeed = getFineTunedSpeed(Value)
+        updateGUI()
+        
+        print("🏃 X Key Speed: Slider " .. Value .. " → CFrame " .. string.format("%.4f", boostSpeed))
+    end,
 })
 
 local JumpToggle = TPTab:CreateToggle({
