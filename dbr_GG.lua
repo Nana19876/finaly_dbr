@@ -1292,17 +1292,48 @@ local DeadHardToggle = TPTab:CreateToggle({
 })
 
 
--- Инициализация сервисов (ВЫНЕСЕНО ИЗ CALLBACK)
+-- ВАЖНО: Этот код должен идти ПОСЛЕ создания TPTab!
+-- Например: local TPTab = Window:CreateTab("Survivor", nil)
+
+-- Проверяем, что TPTab существует
+if not TPTab then
+    warn("❌ TPTab не определен! Создайте вкладку сначала.")
+    return
+end
+
+-- Инициализация сервисов
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
 
 local player = Players.LocalPlayer
-local char = player.Character or player.CharacterAdded:Wait()
-local hrp = char:WaitForChild("HumanoidRootPart")
+
+-- Безопасная инициализация персонажа
+local char = player.Character
+local hrp = nil
+
+-- Функция безопасного получения персонажа
+local function getCharacterSafely()
+    char = player.Character or player.CharacterAdded:Wait()
+    if char then
+        hrp = char:WaitForChild("HumanoidRootPart", 10) -- Таймаут 10 секунд
+        if not hrp then
+            warn("❌ HumanoidRootPart не найден")
+            return false
+        end
+        return true
+    end
+    return false
+end
+
+-- Инициализируем персонажа
+if not getCharacterSafely() then
+    warn("❌ Не удалось инициализировать персонажа")
+    return
+end
 
 -- Глобальные переменные
-local currentSliderValue = 16 -- Начальное значение
+local currentSliderValue = 16
 local boostSpeed = 0
 local isSpeedBoosted = false
 local speedConnection = nil
@@ -1311,7 +1342,7 @@ local frame = nil
 local speedLabel = nil
 local statusLabel = nil
 
--- Очень тонкая настройка скорости для CFrame на клавишу X
+-- Функция расчета скорости
 local function getFineTunedSpeed(sliderValue)
     if sliderValue <= 16 then
         return sliderValue * 0.005
@@ -1324,77 +1355,99 @@ local function getFineTunedSpeed(sliderValue)
     end
 end
 
--- Обновление персонажа
+-- Обновление персонажа с проверками
 player.CharacterAdded:Connect(function(newChar)
     char = newChar
-    hrp = char:WaitForChild("HumanoidRootPart")
+    hrp = char:WaitForChild("HumanoidRootPart", 10)
+    if not hrp then
+        warn("❌ HumanoidRootPart не найден при респавне")
+    end
 end)
 
--- Создание GUI (ОДИН РАЗ)
+-- Безопасное создание GUI
 local function createGUI()
-    screenGui = player.PlayerGui:FindFirstChild("XCFrameBoostGUI")
-    if screenGui then
-        screenGui:Destroy() -- Удаляем старый GUI если есть
+    -- Проверяем PlayerGui
+    if not player.PlayerGui then
+        warn("❌ PlayerGui не найден")
+        return false
     end
     
-    screenGui = Instance.new("ScreenGui")
-    screenGui.Name = "XCFrameBoostGUI"
-    screenGui.Parent = player.PlayerGui
+    -- Удаляем старый GUI
+    local oldGui = player.PlayerGui:FindFirstChild("XCFrameBoostGUI")
+    if oldGui then
+        oldGui:Destroy()
+    end
+    
+    -- Создаем новый GUI
+    local success, error = pcall(function()
+        screenGui = Instance.new("ScreenGui")
+        screenGui.Name = "XCFrameBoostGUI"
+        screenGui.Parent = player.PlayerGui
 
-    frame = Instance.new("Frame")
-    frame.Size = UDim2.new(0, 300, 0, 80)
-    frame.Position = UDim2.new(0, 10, 0, 10)
-    frame.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1)
-    frame.BackgroundTransparency = 0.2
-    frame.BorderSizePixel = 0
-    frame.Parent = screenGui
+        frame = Instance.new("Frame")
+        frame.Size = UDim2.new(0, 300, 0, 80)
+        frame.Position = UDim2.new(0, 10, 0, 10)
+        frame.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1)
+        frame.BackgroundTransparency = 0.2
+        frame.BorderSizePixel = 0
+        frame.Parent = screenGui
 
-    local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 10)
-    corner.Parent = frame
+        local corner = Instance.new("UICorner")
+        corner.CornerRadius = UDim.new(0, 10)
+        corner.Parent = frame
 
-    local titleLabel = Instance.new("TextLabel")
-    titleLabel.Name = "TitleLabel"
-    titleLabel.Size = UDim2.new(1, 0, 0.4, 0)
-    titleLabel.Position = UDim2.new(0, 0, 0, 0)
-    titleLabel.BackgroundTransparency = 1
-    titleLabel.Text = "X Key CFrame Speed"
-    titleLabel.TextColor3 = Color3.new(1, 1, 1)
-    titleLabel.TextScaled = true
-    titleLabel.Font = Enum.Font.SourceSansBold
-    titleLabel.Parent = frame
+        local titleLabel = Instance.new("TextLabel")
+        titleLabel.Name = "TitleLabel"
+        titleLabel.Size = UDim2.new(1, 0, 0.4, 0)
+        titleLabel.Position = UDim2.new(0, 0, 0, 0)
+        titleLabel.BackgroundTransparency = 1
+        titleLabel.Text = "X Key CFrame Speed"
+        titleLabel.TextColor3 = Color3.new(1, 1, 1)
+        titleLabel.TextScaled = true
+        titleLabel.Font = Enum.Font.SourceSansBold
+        titleLabel.Parent = frame
 
-    speedLabel = Instance.new("TextLabel")
-    speedLabel.Name = "SpeedLabel"
-    speedLabel.Size = UDim2.new(1, 0, 0.3, 0)
-    speedLabel.Position = UDim2.new(0, 0, 0.4, 0)
-    speedLabel.BackgroundTransparency = 1
-    speedLabel.TextColor3 = Color3.new(0.9, 0.9, 0.9)
-    speedLabel.TextScaled = true
-    speedLabel.Font = Enum.Font.SourceSans
-    speedLabel.Parent = frame
+        speedLabel = Instance.new("TextLabel")
+        speedLabel.Name = "SpeedLabel"
+        speedLabel.Size = UDim2.new(1, 0, 0.3, 0)
+        speedLabel.Position = UDim2.new(0, 0, 0.4, 0)
+        speedLabel.BackgroundTransparency = 1
+        speedLabel.TextColor3 = Color3.new(0.9, 0.9, 0.9)
+        speedLabel.TextScaled = true
+        speedLabel.Font = Enum.Font.SourceSans
+        speedLabel.Parent = frame
 
-    statusLabel = Instance.new("TextLabel")
-    statusLabel.Name = "StatusLabel"
-    statusLabel.Size = UDim2.new(1, 0, 0.3, 0)
-    statusLabel.Position = UDim2.new(0, 0, 0.7, 0)
-    statusLabel.BackgroundTransparency = 1
-    statusLabel.Text = "Hold X to boost"
-    statusLabel.TextColor3 = Color3.new(0.8, 0.8, 0.8)
-    statusLabel.TextScaled = true
-    statusLabel.Font = Enum.Font.SourceSans
-    statusLabel.Parent = frame
+        statusLabel = Instance.new("TextLabel")
+        statusLabel.Name = "StatusLabel"
+        statusLabel.Size = UDim2.new(1, 0, 0.3, 0)
+        statusLabel.Position = UDim2.new(0, 0, 0.7, 0)
+        statusLabel.BackgroundTransparency = 1
+        statusLabel.Text = "Hold X to boost"
+        statusLabel.TextColor3 = Color3.new(0.8, 0.8, 0.8)
+        statusLabel.TextScaled = true
+        statusLabel.Font = Enum.Font.SourceSans
+        statusLabel.Parent = frame
+    end)
+    
+    if not success then
+        warn("❌ Ошибка создания GUI:", error)
+        return false
+    end
+    
+    return true
 end
 
--- Обновление GUI
+-- Обновление GUI с проверками
 local function updateGUI()
-    if speedLabel then
+    if speedLabel and speedLabel.Parent then
         speedLabel.Text = "Slider: " .. currentSliderValue .. " → Speed: " .. string.format("%.4f", boostSpeed)
     end
 end
 
 local function updateStatus()
-    if not statusLabel or not frame then return end
+    if not statusLabel or not statusLabel.Parent or not frame or not frame.Parent then 
+        return 
+    end
     
     if isSpeedBoosted then
         statusLabel.Text = "🚀 X BOOSTING! (Fine Control)"
@@ -1407,9 +1460,10 @@ local function updateStatus()
     end
 end
 
--- Функции управления
+-- Безопасные функции управления
 local function enableSpeedBoost()
-    if isSpeedBoosted then return end
+    if isSpeedBoosted or not hrp or not hrp.Parent then return end
+    
     isSpeedBoosted = true
     updateStatus()
     
@@ -1426,6 +1480,7 @@ end
 
 local function disableSpeedBoost()
     if not isSpeedBoosted then return end
+    
     isSpeedBoosted = false
     updateStatus()
     
@@ -1435,11 +1490,12 @@ local function disableSpeedBoost()
     end
 end
 
--- Создание подключений (ОДИН РАЗ)
+-- Создание подключений
 local function setupConnections()
+    -- Очищаем старые подключения
     if _G.XSpeedConnections then
         for _, conn in pairs(_G.XSpeedConnections) do
-            if conn then
+            if conn and conn.Connected then
                 conn:Disconnect()
             end
         end
@@ -1461,29 +1517,50 @@ local function setupConnections()
     }
 end
 
--- Инициализация
-createGUI()
-setupConnections()
-boostSpeed = getFineTunedSpeed(currentSliderValue)
-updateGUI()
-updateStatus()
+-- Инициализация с проверками
+local function initialize()
+    if not createGUI() then
+        warn("❌ Не удалось создать GUI")
+        return false
+    end
+    
+    setupConnections()
+    boostSpeed = getFineTunedSpeed(currentSliderValue)
+    updateGUI()
+    updateStatus()
+    
+    print("✅ Speed system инициализирован")
+    return true
+end
 
--- ТЕПЕРЬ СОЗДАЕМ СЛАЙДЕР
-local Slider = TPTab:CreateSlider({
-    Name = "WalkSpeed Slide (X)",
-    Range = {1, 350},
-    Increment = 1,
-    Suffix = "Speed",
-    CurrentValue = 16,
-    Callback = function(Value) -- ИСПРАВЛЕНО: используем параметр Value правильно
-        -- Обновляем только значения при изменении слайдера
-        currentSliderValue = Value -- ИСПРАВЛЕНО: не переопределяем параметр
-        boostSpeed = getFineTunedSpeed(Value)
-        updateGUI()
-        
-        print("🏃 X Key Speed: Slider " .. Value .. " → CFrame " .. string.format("%.4f", boostSpeed))
-    end,
-})
+-- Запускаем инициализацию
+if not initialize() then
+    warn("❌ Инициализация не удалась")
+    return
+end
+
+-- СОЗДАНИЕ СЛАЙДЕРА (с проверкой TPTab)
+local sliderSuccess, sliderError = pcall(function()
+    local Slider = TPTab:CreateSlider({
+        Name = "WalkSpeed Slide (X)",
+        Range = {1, 350},
+        Increment = 1,
+        Suffix = "Speed",
+        CurrentValue = 16,
+        Callback = function(Value)
+            currentSliderValue = Value
+            boostSpeed = getFineTunedSpeed(Value)
+            updateGUI()
+            
+            print("🏃 X Key Speed: Slider " .. Value .. " → CFrame " .. string.format("%.4f", boostSpeed))
+        end,
+    })
+end)
+
+if not sliderSuccess then
+    warn("❌ Ошибка создания слайдера:", sliderError)
+    warn("Убедитесь, что TPTab создан до этого кода!")
+end
 
 local JumpToggle = TPTab:CreateToggle({
 	Name = "Jump (Space)",
