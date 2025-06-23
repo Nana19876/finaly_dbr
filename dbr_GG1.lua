@@ -1323,12 +1323,17 @@ local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
 
 local player = Players.LocalPlayer
+
+-- ИСПРАВЛЕНИЕ 1: Определяем Value (замените на нужное значение)
+local Value = 50 -- Или получите это значение из слайдера/настроек
+
 local char = player.Character or player.CharacterAdded:Wait()
 local hrp = char:WaitForChild("HumanoidRootPart")
 
-player.CharacterAdded:Connect(function(c)
-    char = c
-    hrp = c:WaitForChild("HumanoidRootPart")
+-- ИСПРАВЛЕНИЕ 2: Правильное обновление персонажа
+player.CharacterAdded:Connect(function(newChar)
+    char = newChar
+    hrp = char:WaitForChild("HumanoidRootPart")
 end)
 
 local boostSpeed = getFineTunedSpeed(Value)
@@ -1388,80 +1393,86 @@ if not screenGui then
     statusLabel.Parent = frame
 end
 
--- Обновление GUI
+-- ИСПРАВЛЕНИЕ 3: Проверка существования GUI элементов
 local frame = screenGui:FindFirstChild("Frame")
-local speedLabel = frame:FindFirstChild("SpeedLabel")
-local statusLabel = frame:FindFirstChild("StatusLabel")
-
-speedLabel.Text = "Slider: " .. Value .. " → Speed: " .. string.format("%.4f", boostSpeed)
-
-local function updateStatus()
-    if isSpeedBoosted then
-        statusLabel.Text = "🚀 X BOOSTING! (Fine Control)"
-        statusLabel.TextColor3 = Color3.new(0, 1, 0)
-        frame.BackgroundColor3 = Color3.new(0, 0.2, 0)
-    else
-        statusLabel.Text = "Hold X to boost"
-        statusLabel.TextColor3 = Color3.new(0.8, 0.8, 0.8)
-        frame.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1)
-    end
-end
-
--- Функции управления
-local function enableSpeedBoost()
-    if isSpeedBoosted then return end
-    isSpeedBoosted = true
-    updateStatus()
+if frame then
+    local speedLabel = frame:FindFirstChild("SpeedLabel")
+    local statusLabel = frame:FindFirstChild("StatusLabel")
     
-    speedConnection = RunService.RenderStepped:Connect(function()
-        if isSpeedBoosted and hrp and hrp.Parent then
-            local humanoid = char:FindFirstChild("Humanoid")
-            if humanoid and humanoid.MoveDirection.Magnitude > 0 then
-                local direction = humanoid.MoveDirection.Unit
-                hrp.CFrame = hrp.CFrame + direction * boostSpeed
+    if speedLabel then
+        speedLabel.Text = "Slider: " .. Value .. " → Speed: " .. string.format("%.4f", boostSpeed)
+    end
+
+    local function updateStatus()
+        if not statusLabel or not frame then return end
+        
+        if isSpeedBoosted then
+            statusLabel.Text = "🚀 X BOOSTING! (Fine Control)"
+            statusLabel.TextColor3 = Color3.new(0, 1, 0)
+            frame.BackgroundColor3 = Color3.new(0, 0.2, 0)
+        else
+            statusLabel.Text = "Hold X to boost"
+            statusLabel.TextColor3 = Color3.new(0.8, 0.8, 0.8)
+            frame.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1)
+        end
+    end
+
+    -- Функции управления
+    local function enableSpeedBoost()
+        if isSpeedBoosted then return end
+        isSpeedBoosted = true
+        updateStatus()
+        
+        speedConnection = RunService.RenderStepped:Connect(function()
+            -- ИСПРАВЛЕНИЕ 4: Дополнительные проверки
+            if isSpeedBoosted and hrp and hrp.Parent and char and char.Parent then
+                local humanoid = char:FindFirstChild("Humanoid")
+                if humanoid and humanoid.MoveDirection.Magnitude > 0 then
+                    local direction = humanoid.MoveDirection.Unit
+                    hrp.CFrame = hrp.CFrame + direction * boostSpeed
+                end
+            end
+        end)
+    end
+
+    local function disableSpeedBoost()
+        if not isSpeedBoosted then return end
+        isSpeedBoosted = false
+        updateStatus()
+        
+        if speedConnection then
+            speedConnection:Disconnect()
+            speedConnection = nil
+        end
+    end
+
+    -- Управление подключениями
+    if _G.XSpeedConnections then
+        for _, conn in pairs(_G.XSpeedConnections) do
+            if conn then
+                conn:Disconnect()
             end
         end
-    end)
-end
+    end
 
-local function disableSpeedBoost()
-    if not isSpeedBoosted then return end
-    isSpeedBoosted = false
+    _G.XSpeedConnections = {
+        UserInputService.InputBegan:Connect(function(input, gameProcessed)
+            if gameProcessed then return end
+            if input.KeyCode == Enum.KeyCode.X then
+                enableSpeedBoost()
+            end
+        end),
+        
+        UserInputService.InputEnded:Connect(function(input, gameProcessed)
+            if input.KeyCode == Enum.KeyCode.X then
+                disableSpeedBoost()
+            end
+        end)
+    }
+
     updateStatus()
-    
-    if speedConnection then
-        speedConnection:Disconnect()
-        speedConnection = nil
-    end
+    print("🏃 X Key Speed: Slider " .. Value .. " → CFrame " .. string.format("%.4f", boostSpeed))
 end
-
--- Управление подключениями (изменено на X)
-if _G.XSpeedConnections then
-    for _, conn in pairs(_G.XSpeedConnections) do
-        conn:Disconnect()
-    end
-end
-
-_G.XSpeedConnections = {
-    UserInputService.InputBegan:Connect(function(input, gameProcessed)
-        if gameProcessed then return end
-        if input.KeyCode == Enum.KeyCode.X then  -- Изменено на X
-            enableSpeedBoost()
-        end
-    end),
-    
-    UserInputService.InputEnded:Connect(function(input, gameProcessed)
-        if input.KeyCode == Enum.KeyCode.X then  -- Изменено на X
-            disableSpeedBoost()
-        end
-    end)
-}
-
-updateStatus()
-print("🏃 X Key Speed: Slider " .. Value .. " → CFrame " .. string.format("%.4f", boostSpeed))
-
-   end,
-})
 
 local JumpToggle = TPTab:CreateToggle({
 	Name = "Jump (Space)",
